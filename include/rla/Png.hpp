@@ -20,31 +20,21 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef RLA_PNG_HPP
-#define RLA_PNG_HPP
+#pragma once
 
+#include <rla/PngColor.hpp>
 #include <string>
 #include <cstddef>
+
 namespace rl
 {
     class Png
     {
-        public:
-            enum class Color
-            {
-                None,
-                G,
-                Ga,
-                Rgb,
-                Rgba,
-                Palette
-            };
-
         private:
             std::string path = "";
             std::size_t width = 0;
             std::size_t height = 0;
-            rl::Png::Color color = rl::Png::Color::None;
+            rl::PngColor color = rl::PngColor::None;
             std::size_t bit_depth = 0;
 
         public:
@@ -57,8 +47,7 @@ namespace rl
             std::size_t GetWidth() const noexcept;
             std::size_t GetHeight() const noexcept;
             std::size_t GetBitDepth() const noexcept;
+            rl::PngColor GetColor() const noexcept;
             void Clear() noexcept;
     };
 }
-
-#endif

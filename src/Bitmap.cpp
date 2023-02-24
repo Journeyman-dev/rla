@@ -21,7 +21,8 @@
 */
 
 #include <rla/Bitmap.hpp>
-#include <rla/PngException.hpp>
+#include <rla/bitmap_exception.hpp>
+#include <rla/BitmapView.hpp>
 #include <cstddef>
 #include "png_wrapper.h"
 #include "pngw_ext.hpp"
@@ -58,9 +59,9 @@ std::size_t rl::Bitmap::GetRowSize() const noexcept
 {
     return
         rl::Bitmap::GetRowSize(
-            this->GetColor(),
+            this->GetWidth(),
             this->GetChannelSize(),
-            this->GetWidth()
+            this->GetColor()
         );
 }
 
@@ -68,10 +69,10 @@ std::size_t rl::Bitmap::GetPageSize() const noexcept
 {
     return
         rl::Bitmap::GetPageSize(
-            this->GetColor(),
-            this->GetChannelSize(),
             this->GetWidth(),
-            this->GetHeight()
+            this->GetHeight(),
+            this->GetChannelSize(),
+            this->GetColor()
         );
 }
 
@@ -79,27 +80,67 @@ std::size_t rl::Bitmap::GetSize() const noexcept
 {
     return
         rl::Bitmap::GetSize(
-            this->GetColor(),
-            this->GetChannelSize(),
             this->GetWidth(),
             this->GetHeight(),
-            this->GetPages()
+            this->GetPages(),
+            this->GetChannelSize(),
+            this->GetColor()
         );
+}
+
+std::size_t rl::Bitmap::GetRowOffset() const noexcept
+{
+    return this->GetRowSize();
+}
+
+std::size_t rl::Bitmap::GetPageOffset() const noexcept
+{
+    return this->GetPageSize();
 }
 
 std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
 {
     return
         rl::Bitmap::GetByteIndex(
-            this->GetColor(),
-            this->GetChannelSize(),
             this->GetWidth(),
             this->GetHeight(),
             this->GetPages(),
+            this->GetChannelSize(),
+            this->GetColor(),
+            this->GetRowOffset(),
+            this->GetPageOffset(),
             x,
             y,
             page,
             channel
+        );
+}
+
+rl::BitmapView rl::Bitmap::GetView() const noexcept
+{
+    return
+        this->GetView(
+            0,
+            0,
+            0,
+            this->GetWidth(),
+            this->GetHeight(),
+            this->GetPages()
+        );
+}
+
+rl::BitmapView rl::Bitmap::GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t pages) const noexcept
+{
+    return
+        rl::BitmapView(
+            this->GetData(x, y, page, 0),
+            width,
+            height,
+            pages,
+            this->GetChannelSize(),
+            this->GetColor(),
+            this->GetRowOffset(),
+            this->GetPageOffset()
         );
 }
 
@@ -116,6 +157,6 @@ void rl::Bitmap::SavePng(std::string_view path, std::size_t page)
     );
     if (result != PNGW_RESULT_OK)
     {
-        throw rl::PngException(rl::pngw_result_to_png_exception_error(result));
+        throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
     }
 }

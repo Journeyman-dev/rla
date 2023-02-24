@@ -20,63 +20,46 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <rla/Png.hpp>
-#include <rla/bitmap_exception.hpp>
-#include "png_wrapper.h"
-#include "pngw_ext.hpp"
+#include <rla/font_exception.hpp>
+#include <stdexcept>
+#include <ostream>
+#include <sstream>
 
-rl::Png::Png(std::string_view path)
+rl::font_exception::font_exception(rl::font_exception::Error error) noexcept
+    : error(error)
 {
-    this->Load(path);
 }
 
-void rl::Png::Load(std::string_view path)
+const char* rl::font_exception::what() const noexcept
 {
-    std::size_t width, height, bit_depth;
-    pngwcolor_t color;
-    pngwresult_t result = pngwFileInfo(path.data(), &width, &height, &bit_depth, &color);
-    if (result != PNGW_RESULT_OK)
+    std::stringstream ss("");
+    ss << "font load or save error: \"" << this->error << "\"";
+    return ss.str().data();
+}
+
+rl::font_exception::Error rl::font_exception::get_error() const noexcept
+{
+    return this->error;
+}
+
+std::ostream& rl::operator<<(std::ostream& os, rl::font_exception::Error error)
+{
+    switch (error)
     {
-        throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
+        case rl::font_exception::Error::FontNotLoaded:
+            os << "font not loaded";
+            break;
+        case rl::font_exception::Error::FreetypeInitializeError:
+            os << "error initializing freetype";
+            break;
+        case rl::font_exception::Error::FontLoadError:
+            os << "failed to load font";
+            break;
+        case rl::font_exception::Error::GlyphLoadError:
+            os << "failed to load glyph";
+            break;
+        default:
+            os << "unkown error";
     }
-    this->path = path;
-    this->width = width;
-    this->height = height;
-    this->color = rl::pngw_color_to_png_color(color);
-    this->bit_depth = bit_depth;
-}
-
-bool rl::Png::GetEmpty() const noexcept
-{
-    return this->color == rl::PngColor::None;
-}
-
-std::string_view rl::Png::GetPath() const noexcept
-{
-    return this->path;
-}
-
-std::size_t rl::Png::GetWidth() const noexcept
-{
-    return this->width;
-}
-
-std::size_t rl::Png::GetHeight() const noexcept
-{
-    return this->height;
-}
-
-std::size_t rl::Png::GetBitDepth() const noexcept
-{
-    return this->bit_depth;
-}
-
-void rl::Png::Clear() noexcept
-{
-    *this = rl::Png();
-}
-
-rl::PngColor rl::Png::GetColor() const noexcept
-{
-    return this->color;
+    return os;
 }

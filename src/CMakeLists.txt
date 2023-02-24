@@ -20,11 +20,15 @@
 
 target_sources(${PROJECT_NAME}
     PRIVATE
+        "bitmap_exception.cpp"
         "Bitmap.cpp"
+        "BitmapView.cpp"
+        "font_exception.cpp"
+        "Font.cpp"
         "Image.cpp"
         "MutableBitmap.cpp"
+        "MutableBitmapView.cpp"
         "Png.cpp"
-        "PngException.cpp"
         "pngw_ext.cpp"
         "pngw_impl.cpp"
 )

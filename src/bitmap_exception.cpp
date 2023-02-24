@@ -20,42 +20,43 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef RLA_PNG_RESULT_HPP
-#define RLA_PNG_RESULT_HPP
-
+#include <rla/bitmap_exception.hpp>
+#include "png_wrapper.h"
 #include <ostream>
-#include <stdexcept>
+#include <sstream>
 
-namespace rl
+rl::bitmap_exception::bitmap_exception(rl::bitmap_exception::Error error) noexcept
+    : error(error)
+{}
+
+const char* rl::bitmap_exception::what() const noexcept
 {
-    class PngException : std::exception
-    {
-        public:
-            enum class Error
-            {
-                FileNotFound = 1,
-                FileCreationFailure = 2,
-                OutOfMemory = 3,
-                InvalidFileSigniture = 4,
-                JumpBufferCalled = 5,
-                NullArg = 6,
-                InvalidDepth = 7,
-                InvalidColor = 8,
-                InvalidDimensions = 9,
-                BlitOutOfImage = 10
-            };
-
-        private:
-            rl::PngException::Error error;
-
-        public:
-            PngException(rl::PngException::Error result) noexcept;
-
-            const char* what() const noexcept override;
-            rl::PngException::Error get_error() const noexcept;
-    };
-
-    std::ostream& operator<<(std::ostream& os, rl::PngException::Error error);
+    std::stringstream ss("");
+    ss << "png load or save error: \"" << this->error << "\"";
+    return ss.str().data();
 }
 
-#endif
+rl::bitmap_exception::Error rl::bitmap_exception::get_error() const noexcept
+{
+    return this->error;
+}
+
+std::ostream& rl::operator<<(std::ostream& os, rl::bitmap_exception::Error error)
+{
+    if (error == rl::bitmap_exception::Error::BlitOutOfBitmap)
+    {
+        // This error is not from png_wrapper.h
+        os << "blit out of bitmap";
+    }
+    else if (
+        static_cast<pngwresult_t>(error) >= PNGW_RESULT_OK &&
+        static_cast<pngwresult_t>(error) < PNGW_RESULT_COUNT)
+    {
+        os << PNGW_RESULT_DESCRIPTIONS[static_cast<pngwresult_t>(error)];
+    }
+    else
+    {
+        os << "unkown error";
+    }
+    return os;
+}

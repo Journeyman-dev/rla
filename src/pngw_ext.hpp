@@ -24,16 +24,16 @@
 #define RLA_PNGW_EXT_HPP
 
 #include <rla/Png.hpp>
-#include <rla/PngException.hpp>
+#include <rla/PngColor.hpp>
+#include <rla/bitmap_exception.hpp>
 #include <rla/Bitmap.hpp>
 #include "png_wrapper.h"
 
 namespace rl
 {
-    rl::PngException::Error pngw_result_to_png_exception_error(pngwresult_t result) noexcept;
-    rl::Png::Color pngw_color_to_png_color(pngwcolor_t color) noexcept;
-    pngwcolor_t png_color_to_pngw_color(rl::Png::Color color) noexcept;
-    pngwcolor_t bitmap_color_to_pngw_color(rl::Bitmap::Color color) noexcept;
+    rl::bitmap_exception::Error pngw_result_to_bitmap_exception_error(pngwresult_t result) noexcept;
+    rl::PngColor pngw_color_to_png_color(pngwcolor_t color) noexcept;
+    pngwcolor_t png_color_to_pngw_color(rl::PngColor color) noexcept;
 }
 
 #endif

@@ -27,7 +27,6 @@ project(rla
     LANGUAGES CXX
 )
 set(RLA_CXX_STANDARD 20)
-option(RLA_AUTO_FETCH "Automatically fetch the dependencies of RLA using FetchContent." ON)
 add_library(${PROJECT_NAME} STATIC "")
 add_subdirectory(src)
 add_library(rla::rla ALIAS ${PROJECT_NAME})
@@ -35,38 +34,30 @@ target_include_directories(${PROJECT_NAME}
     INTERFACE
         "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
-if (RLA_AUTO_FETCH)
-    Include(FetchContent)
-    FetchContent_Declare(
-        png
-        GIT_REPOSITORY https://github.com/glennrp/libpng
-        GIT_TAG        v1.6.38
-    )
-    FetchContent_Declare(
-        rlm
-        GIT_REPOSITORY https://github.com/Journeyman-dev/rlm
-        GIT_TAG        v0.1.0.0
-    )
-    FetchContent_MakeAvailable(png rlm)
-    target_link_libraries(
-        ${PROJECT_NAME}
-            PRIVATE
-                png
-                rlm
-    )
-else()
-    find_package(PNG REQUIRED)
-    target_include_directories(
-        ${PROJECT_NAME}
-            PRIVATE
-                ${PNG_INCLUDE_DIR}
-    )
-    target_link_libraries(
-        ${PROJECT_NAME}
-            PRIVATE
-                ${PNG_LIBRARY}
-    )
-endif()
+Include(FetchContent)
+FetchContent_Declare(
+    png
+    GIT_REPOSITORY https://github.com/glennrp/libpng
+    GIT_TAG        v1.6.38
+)
+FetchContent_Declare(
+    rlm
+    GIT_REPOSITORY https://github.com/Journeyman-dev/rlm
+    GIT_TAG        v0.3.0
+)
+FetchContent_Declare(
+    freetype
+    GIT_REPOSITORY https://github.com/freetype/freetype
+    GIT_TAG        VER-2-13-0
+)
+FetchContent_MakeAvailable(png rlm freetype)
+target_link_libraries(
+    ${PROJECT_NAME}
+        PRIVATE
+            png
+            rlm::rlm
+            freetype-interface
+)
 target_include_directories(
     ${PROJECT_NAME}
         PUBLIC
@@ -78,4 +69,3 @@ set_target_properties(${PROJECT_NAME}
     CXX_STANDARD ${RLA_CXX_STANDARD}
     CXX_STANDARD_REQUIRED TRUE
 )
-add_subdirectory(test)

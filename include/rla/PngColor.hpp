@@ -20,63 +20,17 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <rla/Png.hpp>
-#include <rla/bitmap_exception.hpp>
-#include "png_wrapper.h"
-#include "pngw_ext.hpp"
+#pragma once
 
-rl::Png::Png(std::string_view path)
+namespace rl
 {
-    this->Load(path);
-}
-
-void rl::Png::Load(std::string_view path)
-{
-    std::size_t width, height, bit_depth;
-    pngwcolor_t color;
-    pngwresult_t result = pngwFileInfo(path.data(), &width, &height, &bit_depth, &color);
-    if (result != PNGW_RESULT_OK)
+    enum class PngColor
     {
-        throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
-    }
-    this->path = path;
-    this->width = width;
-    this->height = height;
-    this->color = rl::pngw_color_to_png_color(color);
-    this->bit_depth = bit_depth;
-}
-
-bool rl::Png::GetEmpty() const noexcept
-{
-    return this->color == rl::PngColor::None;
-}
-
-std::string_view rl::Png::GetPath() const noexcept
-{
-    return this->path;
-}
-
-std::size_t rl::Png::GetWidth() const noexcept
-{
-    return this->width;
-}
-
-std::size_t rl::Png::GetHeight() const noexcept
-{
-    return this->height;
-}
-
-std::size_t rl::Png::GetBitDepth() const noexcept
-{
-    return this->bit_depth;
-}
-
-void rl::Png::Clear() noexcept
-{
-    *this = rl::Png();
-}
-
-rl::PngColor rl::Png::GetColor() const noexcept
-{
-    return this->color;
+        None,
+        G,
+        Ga,
+        Rgb,
+        Rgba,
+        Palette
+    };
 }

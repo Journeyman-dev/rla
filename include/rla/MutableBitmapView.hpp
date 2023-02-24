@@ -22,40 +22,49 @@
 
 #pragma once
 
-#include <rla/BitmapColor.hpp>
 #include <rla/MutableBitmap.hpp>
+#include <rla/BitmapColor.hpp>
 #include <cstddef>
 #include <optional>
-#include <string>
-#include <vector>
 
 namespace rl
 {
-    class Image : public rl::MutableBitmap
+    class MutableBitmapView : public rl::MutableBitmap
     {
         private:
+            unsigned char* pixel_data = nullptr;
+
             std::size_t width = 0;
             std::size_t height = 0;
             std::size_t pages = 0;
-            rl::BitmapColor color = rl::BitmapColor::Rgba;
             std::size_t channel_size = 1;
-            std::vector<unsigned char> data = std::vector<unsigned char>();
+            rl::BitmapColor color = rl::BitmapColor::Rgb;
+            std::size_t row_offset = 0;
+            std::size_t page_offset = 0;
 
         public:
+            constexpr MutableBitmapView() noexcept = default;
+            MutableBitmapView(
+                unsigned char* pixel_data,
+                std::size_t width,
+                std::size_t height,
+                std::size_t pages,
+                std::size_t channel_size,
+                rl::BitmapColor color,
+                std::optional<std::size_t> row_offset_o = std::nullopt,
+                std::optional<std::size_t> page_offset_o = std::nullopt
+            ) noexcept;
+
             using rl::MutableBitmap::MutableBitmap;
 
-            rl::BitmapColor GetColor() const noexcept override;
             std::size_t GetWidth() const noexcept override;
             std::size_t GetHeight() const noexcept override;
             std::size_t GetPages() const noexcept override;
             std::size_t GetChannelSize() const noexcept override;
-            unsigned char* GetMutableData() noexcept override;
+            rl::BitmapColor GetColor() const noexcept override;
+            std::size_t GetRowOffset() const noexcept override;
+            std::size_t GetPageOffset() const noexcept override;
             const unsigned char* GetData() const noexcept override;
-            void Clear() noexcept;
-            void ShrinkToFit();
-            void Reserve(std::size_t bytes);
-            void Create(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color);
-            void LoadPng(const rl::Png& png, std::optional<std::size_t> channel_size_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
-            void LoadPng(std::string_view path, std::optional<std::size_t> channel_size_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
+            unsigned char* GetMutableData() noexcept override;
     };
 }

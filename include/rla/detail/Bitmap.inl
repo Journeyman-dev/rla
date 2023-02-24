@@ -20,23 +20,23 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef RLA_BITMAP_INL
-#define RLA_BITMAP_INL
+#pragma once
 
+#include <rla/BitmapColor.hpp>
 #include <cstddef>
 #include <optional>
 
-constexpr std::size_t rl::Bitmap::GetChannelCount(rl::Bitmap::Color color) noexcept
+constexpr std::size_t rl::Bitmap::GetChannelCount(rl::BitmapColor color) noexcept
 {
     switch (color)
     {
-        case rl::Bitmap::Color::G:
+        case rl::BitmapColor::G:
             return 1;
-        case rl::Bitmap::Color::Ga:
+        case rl::BitmapColor::Ga:
             return 2;
-        case rl::Bitmap::Color::Rgb:
+        case rl::BitmapColor::Rgb:
             return 3;
-        case rl::Bitmap::Color::Rgba:
+        case rl::BitmapColor::Rgba:
         default:
             return 4;
     }
@@ -54,41 +54,41 @@ constexpr std::size_t rl::Bitmap::GetBitDepth(std::size_t channel_size) noexcept
     return channel_size * bytes_per_pixel;
 }
 
-constexpr std::size_t rl::Bitmap::GetPixelSize(rl::Bitmap::Color color, std::size_t byte_depth) noexcept
+constexpr std::size_t rl::Bitmap::GetPixelSize(std::size_t channel_size, rl::BitmapColor color) noexcept
 {
     return
-        rl::Bitmap::GetChannelCount(color) *
-        byte_depth;
-}
-
-constexpr std::size_t rl::Bitmap::GetRowSize(rl::Bitmap::Color color, std::size_t byte_depth, std::size_t width) noexcept
-{
-    return
-        rl::Bitmap::GetChannelCount(color) *
-        byte_depth *
-        width;
-}
-
-constexpr std::size_t rl::Bitmap::GetPageSize(rl::Bitmap::Color color, std::size_t byte_depth, std::size_t width, std::size_t height) noexcept
-{
-    return
-        rl::Bitmap::GetChannelCount(color) *
-        byte_depth *
-        width *
-        height;
-}
-
-constexpr std::size_t rl::Bitmap::GetSize(rl::Bitmap::Color color, std::size_t channel_size, std::size_t width, std::size_t height, std::size_t pages) noexcept
-{
-    return
-        rl::Bitmap::GetChannelCount(color) *
         channel_size *
+        rl::Bitmap::GetChannelCount(color);
+}
+
+constexpr std::size_t rl::Bitmap::GetRowSize(std::size_t width, std::size_t channel_size, rl::BitmapColor color) noexcept
+{
+    return
+        width *
+        channel_size *
+        rl::Bitmap::GetChannelCount(color);
+}
+
+constexpr std::size_t rl::Bitmap::GetPageSize(std::size_t width, std::size_t height, std::size_t channel_size, rl::BitmapColor color) noexcept
+{
+    return
         width *
         height *
-        pages;
+        channel_size *
+        rl::Bitmap::GetChannelCount(color);
 }
 
-constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(rl::Bitmap::Color color, std::size_t channel_size, std::size_t width, std::size_t height, std::size_t pages, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept
+constexpr std::size_t rl::Bitmap::GetSize(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color) noexcept
+{
+    return
+        width *
+        height *
+        pages *
+        channel_size *
+        rl::Bitmap::GetChannelCount(color);
+}
+
+constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept
 {
     if (
         channel >= rl::Bitmap::GetChannelCount(color) ||
@@ -99,14 +99,21 @@ constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(rl::Bitmap::Color 
     {
         return std::nullopt;
     }
-    const auto pixel_size = rl::Bitmap::GetPixelSize(color, channel_size);
-    const auto row_size = rl::Bitmap::GetRowSize(color, channel_size, width);
-    const auto page_size = rl::Bitmap::GetPageSize(color, channel_size, width, height);
     return
-        (pixel_size * x) +
-        (row_size * y) +
-        (page_size * page) +
-        (channel_size * channel);
+        (
+            x *
+            rl::Bitmap::GetPixelSize(channel_size, color)
+        ) +
+        (
+            y *
+            row_offset
+        ) +
+        (
+            page *
+            page_offset
+        ) +
+        (
+            channel_size * 
+            channel
+        );
 }
-
-#endif

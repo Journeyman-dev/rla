@@ -20,63 +20,49 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <rla/Png.hpp>
-#include <rla/bitmap_exception.hpp>
-#include "png_wrapper.h"
-#include "pngw_ext.hpp"
+#pragma once
 
-rl::Png::Png(std::string_view path)
-{
-    this->Load(path);
-}
+#include <rlm/cellular/cell_vector2.hpp>
+#include <rla/types.hpp>
+#include <rla/Bitmap.hpp>
 
-void rl::Png::Load(std::string_view path)
+#include <vector>
+#include <cstddef>
+#include <optional>
+
+namespace rl
 {
-    std::size_t width, height, bit_depth;
-    pngwcolor_t color;
-    pngwresult_t result = pngwFileInfo(path.data(), &width, &height, &bit_depth, &color);
-    if (result != PNGW_RESULT_OK)
+    struct console_atlas_layout
     {
-        throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
-    }
-    this->path = path;
-    this->width = width;
-    this->height = height;
-    this->color = rl::pngw_color_to_png_color(color);
-    this->bit_depth = bit_depth;
+        enum class SourceType
+        {
+            Bitmap,
+            Png,
+            Font
+        };
+
+        struct glyph
+        {
+            std::size_t source_i = 0;
+            rl::console_atlas_layout::SourceType source_type = rl::console_atlas_layout::SourceType::Png;
+            std::optional<rl::cell_vector2> top_left_o;
+            std::optional<rl::codepoint_t> codepoint_o;
+        };
+
+        struct face
+        {
+            bool letterboxed_wide = false;
+            bool letterboxed_tall = false;
+            std::optional<std::size_t> font_i_o;
+            std::vector<rl::console_atlas_layout::glyph> glyphs;
+        };
+
+        std::vector<rl::Bitmap> bitmap_sources;
+        std::vector<std::string> png_sources;
+        std::vector<std::string> font_sources;
+        int tile_width;
+        int tile_height;
+        std::vector<rl::console_atlas_layout::face> faces;
+    };
 }
 
-bool rl::Png::GetEmpty() const noexcept
-{
-    return this->color == rl::PngColor::None;
-}
-
-std::string_view rl::Png::GetPath() const noexcept
-{
-    return this->path;
-}
-
-std::size_t rl::Png::GetWidth() const noexcept
-{
-    return this->width;
-}
-
-std::size_t rl::Png::GetHeight() const noexcept
-{
-    return this->height;
-}
-
-std::size_t rl::Png::GetBitDepth() const noexcept
-{
-    return this->bit_depth;
-}
-
-void rl::Png::Clear() noexcept
-{
-    *this = rl::Png();
-}
-
-rl::PngColor rl::Png::GetColor() const noexcept
-{
-    return this->color;
-}

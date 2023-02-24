@@ -20,26 +20,32 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-#ifndef RLA_MUTABLE_BITMAP_HPP
-#define RLA_MUTABLE_BITMAP_HPP
+#pragma once
 
 #include <rla/Bitmap.hpp>
+#include <rlm/cellular/cell_box2.hpp>
 #include <cstddef>
+
 
 namespace rl
 {
+    class MutableBitmapView;
+
     class Png;
     class MutableBitmap : public rl::Bitmap
     {
+        protected:
+            bool blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept;
+
         public:
             using rl::Bitmap::Bitmap;
 
             virtual unsigned char* GetMutableData() noexcept = 0;
             unsigned char* GetMutableData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) noexcept;
+            rl::MutableBitmapView GetMutableView() noexcept;
+            rl::MutableBitmapView GetMutableView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height) noexcept;
+            void BlitBitmap(const rl::Bitmap& bitmap, std::size_t x, std::size_t y, std::size_t page);
             void BlitPng(const rl::Png& png, std::size_t x, std::size_t y, std::size_t page);
             void BlitPng(std::string_view path, std::size_t x, std::size_t y, std::size_t page);
     };
 }
-
-#endif

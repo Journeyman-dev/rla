@@ -21,13 +21,15 @@
 */
 
 #include <rla/Image.hpp>
+#include <rla/Png.hpp>
+#include <rla/color_conversion.hpp>
 
 unsigned char* rl::Image::GetMutableData() noexcept
 {
     return this->data.data();
 }
 
-rl::Bitmap::Color rl::Image::GetColor() const noexcept
+rl::BitmapColor rl::Image::GetColor() const noexcept
 {
     return this->color;
 }
@@ -55,4 +57,63 @@ std::size_t rl::Image::GetChannelSize() const noexcept
 const unsigned char* rl::Image::GetData() const noexcept
 {
     return this->data.data();
+}
+
+void rl::Image::Clear() noexcept
+{
+    this->data.clear();
+    this->width = 0;
+    this->height = 0;
+    this->pages = 0;
+    this->channel_size = 1;
+    this->color = rl::BitmapColor::Rgba;
+}
+
+void rl::Image::ShrinkToFit()
+{
+    this->data.shrink_to_fit();
+}
+
+void rl::Image::Reserve(std::size_t bytes)
+{
+    this->data.reserve(bytes);
+}
+
+void rl::Image::Create(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color)
+{
+    this->Clear();
+    const auto size = 
+        rl::Bitmap::GetSize(
+            width,
+            height,
+            pages,
+            channel_size,
+            color
+        );
+    this->data.resize(size, 0);
+    this->width = width;
+    this->height = height;
+    this->pages = pages;
+    this->color = color;
+    this->channel_size = channel_size;
+}
+
+void rl::Image::LoadPng(const rl::Png& png, std::optional<std::size_t> channel_size_o, std::optional<rl::BitmapColor> color_o)
+{
+    const auto color = 
+        color_o.value_or(
+            rl::to_bitmap_color(png.GetColor())
+        );
+    const auto channel_size =
+        channel_size_o.value_or(
+            rl::Bitmap::GetChannelSize(png.GetBitDepth())
+        );
+    this->Create(png.GetWidth(), png.GetHeight(), 1, channel_size, color);
+    this->BlitPng(png, 0, 0, 0);
+}
+
+void rl::Image::LoadPng(std::string_view path, std::optional<std::size_t> channel_size_o, std::optional<rl::BitmapColor> color_o)
+{
+    const auto png = rl::Png(path);
+    this->LoadPng(png, channel_size_o, color_o);
 }

@@ -22,67 +22,50 @@
 
 #include "pngw_ext.hpp"
 #include "png_wrapper.h"
-#include <rla/PngException.hpp>
+#include <rla/bitmap_exception.hpp>
 #include <cassert>
 
-rl::PngException::Error rl::pngw_result_to_png_exception_error(pngwresult_t result) noexcept
+rl::bitmap_exception::Error rl::pngw_result_to_bitmap_exception_error(pngwresult_t result) noexcept
 {
     assert(result > PNGW_RESULT_OK && result <= PNGW_RESULT_COUNT && "invalid pngwresult_t");
-    return static_cast<rl::PngException::Error >(result);
+    return static_cast<rl::bitmap_exception::Error >(result);
 }
 
-rl::Png::Color rl::pngw_color_to_png_color(pngwcolor_t color) noexcept
+rl::PngColor rl::pngw_color_to_png_color(pngwcolor_t color) noexcept
 {
     assert(color < PNGW_COLOR_PALETTE || color >= PNGW_COLOR_COUNT && "invalid pngwcolor_t");
     switch (color)
     {
         case PNGW_COLOR_PALETTE:
-            return rl::Png::Color::Palette;
+            return rl::PngColor::Palette;
         case PNGW_COLOR_G:
-            return rl::Png::Color::G;
+            return rl::PngColor::G;
         case PNGW_COLOR_GA:
-            return rl::Png::Color::Ga;
+            return rl::PngColor::Ga;
         case PNGW_COLOR_RGB:
-            return rl::Png::Color::Rgb;
+            return rl::PngColor::Rgb;
         case PNGW_COLOR_RGBA:
-            return rl::Png::Color::Rgba;
+            return rl::PngColor::Rgba;
         default:
-            return rl::Png::Color::None;
+            return rl::PngColor::None;
     }
 }
 
-pngwcolor_t rl::png_color_to_pngw_color(rl::Png::Color color) noexcept
+pngwcolor_t rl::png_color_to_pngw_color(rl::PngColor color) noexcept
 {
     switch (color)
     {
-        case rl::Png::Color::Palette:
+        case rl::PngColor::Palette:
             return PNGW_COLOR_PALETTE;
-        case rl::Png::Color::G:
+        case rl::PngColor::G:
             return PNGW_COLOR_G;
-        case rl::Png::Color::Ga:
+        case rl::PngColor::Ga:
             return PNGW_COLOR_GA;
-        case rl::Png::Color::Rgb:
+        case rl::PngColor::Rgb:
             return PNGW_COLOR_RGB;
-        case rl::Png::Color::Rgba:
+        case rl::PngColor::Rgba:
             return PNGW_COLOR_RGBA;
     }
     assert(true && "invalid png color");
-    return PNGW_COLOR_PALETTE;
-}
-
-pngwcolor_t rl::bitmap_color_to_pngw_color(rl::Bitmap::Color color) noexcept
-{
-    switch (color)
-    {
-        case rl::Bitmap::Color::G:
-            return PNGW_COLOR_G;
-        case rl::Bitmap::Color::Ga:
-            return PNGW_COLOR_GA;
-        case rl::Bitmap::Color::Rgb:
-            return PNGW_COLOR_RGB;
-        case rl::Bitmap::Color::Rgba:
-            return PNGW_COLOR_RGBA;
-    }
-    assert(true && "invalid bitmap color");
     return PNGW_COLOR_PALETTE;
 }

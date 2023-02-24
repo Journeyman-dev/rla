@@ -20,37 +20,16 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <rla/PngException.hpp>
-#include "png_wrapper.h"
-#include <ostream>
-#include <sstream>
+#pragma once
 
-rl::PngException::PngException(rl::PngException::Error error) noexcept
-    : error(error)
-{}
+#include <rla/PngColor.hpp>
+#include <rla/BitmapColor.hpp>
 
-const char* rl::PngException::what() const noexcept
+namespace rl
 {
-    std::stringstream ss("");
-    ss << "png load or save error: \"" << this->error << "\"";
-    return ss.str().data();
+    constexpr rl::PngColor to_png_color(rl::BitmapColor color) noexcept;
+
+    constexpr rl::BitmapColor to_bitmap_color(rl::PngColor color) noexcept;
 }
 
-rl::PngException::Error rl::PngException::get_error() const noexcept
-{
-    return this->error;
-}
-
-std::ostream& rl::operator<<(std::ostream& os, rl::PngException::Error error)
-{
-    if (error == rl::PngException::Error::BlitOutOfImage)
-    {
-        // This error is not from png_wrapper.h
-        os << "blit out of bitmap";
-    }
-    else
-    {
-        os << PNGW_RESULT_DESCRIPTIONS[static_cast<pngwresult_t>(error)];
-    }
-    return os;
-}
+#include <rla/detail/color_conversion.inl>

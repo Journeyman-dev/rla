@@ -20,40 +20,38 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef RLA_BITMAP_HPP
-#define RLA_BITMAP_HPP
+#pragma once
 
+#include <rla/BitmapColor.hpp>
 #include <cstddef>
 #include <optional>
 #include <string>
 
 namespace rl
 {
+    class BitmapView;
+
     class Bitmap
     {
         public:
-            enum class Color
-            {
-                G,
-                Ga,
-                Rgb,
-                Rgba
-            };
-            static constexpr std::size_t GetChannelCount(rl::Bitmap::Color color) noexcept;
+            static constexpr std::size_t GetChannelCount(rl::BitmapColor color) noexcept;
             static constexpr std::size_t GetChannelSize(std::size_t bit_depth) noexcept;
             static constexpr std::size_t GetBitDepth(std::size_t channel_size) noexcept;
-            static constexpr std::size_t GetPixelSize(rl::Bitmap::Color color, std::size_t byte_depth) noexcept;
-            static constexpr std::size_t GetRowSize(rl::Bitmap::Color color, std::size_t byte_depth, std::size_t width) noexcept;
-            static constexpr std::size_t GetPageSize(rl::Bitmap::Color color, std::size_t byte_depth, std::size_t width, std::size_t height) noexcept;
-            static constexpr std::size_t GetSize(rl::Bitmap::Color color, std::size_t byte_depth, std::size_t width, std::size_t height, std::size_t pages = 1) noexcept;
-            static constexpr std::optional<std::size_t> GetByteIndex(rl::Bitmap::Color color, std::size_t byte_depth, std::size_t width, std::size_t height, std::size_t pages, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
+            static constexpr std::size_t GetPixelSize(std::size_t channel_size, rl::BitmapColor color) noexcept;
+            static constexpr std::size_t GetRowSize(std::size_t width, std::size_t channel_size, rl::BitmapColor color) noexcept;
+            static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, std::size_t channel_size, rl::BitmapColor color) noexcept;
+            static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color) noexcept;
+            static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
+
         public:
-            virtual rl::Bitmap::Color GetColor() const noexcept = 0;
             virtual std::size_t GetWidth() const noexcept = 0;
             virtual std::size_t GetHeight() const noexcept = 0;
             virtual std::size_t GetPages() const noexcept = 0;
             virtual std::size_t GetChannelSize() const noexcept = 0;
+            virtual rl::BitmapColor GetColor() const noexcept = 0;
             std::size_t GetBitDepth() const noexcept;
+            virtual std::size_t GetRowOffset() const noexcept;
+            virtual std::size_t GetPageOffset() const noexcept;
             virtual const unsigned char* GetData() const noexcept = 0;
             const unsigned char* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
             std::size_t GetChannelCount() const noexcept;
@@ -61,10 +59,11 @@ namespace rl
             std::size_t GetPageSize() const noexcept;
             std::size_t GetSize() const noexcept;
             std::optional<std::size_t> GetByteIndex(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
+            bool GetIsEmpty() const noexcept;
+            rl::BitmapView GetView() const noexcept;
+            rl::BitmapView GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t pages) const noexcept;
             void SavePng(std::string_view path, std::size_t page = 0);
     };
 }
 
 #include <rla/detail/Bitmap.inl>
-
-#endif

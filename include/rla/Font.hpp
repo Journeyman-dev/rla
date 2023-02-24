@@ -20,11 +20,33 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <iostream>
+#pragma once
+
+#include <string>
 #include <rla/Bitmap.hpp>
 
-int main()
+struct FT_LibraryRec_;
+struct FT_FaceRec_;
+
+namespace rl
 {
-    std::cout << "lol" << std::endl;
-    return 0;
+    class Font
+    {
+        private:
+            FT_LibraryRec_* freetype_library = nullptr;
+            FT_FaceRec_* freetype_face = nullptr;
+
+        public:
+            constexpr Font() noexcept = default;
+            ~Font() noexcept;
+
+            Font(std::string_view path);
+
+            void Load(std::string_view path);
+            void Unload();
+            bool IsLoaded() const noexcept;
+            void SetPixelSizes(int width, int height);
+            void LoadChar(char character);
+            rl::BitmapView GetBitmapView() const;
+    };
 }
