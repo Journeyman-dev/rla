@@ -29,7 +29,7 @@ void rl::Font::Load(std::string_view path)
     {
         if (FT_Init_FreeType(&this->freetype_library))
         {
-            throw rl::font_exception(rl::font_exception::Error::FreetypeInitializeError);
+            throw rl::font_exception(rl::font_exception::Error::FreetypeInitializeFailure);
         }
     }
     if (this->freetype_face != nullptr)
@@ -39,7 +39,7 @@ void rl::Font::Load(std::string_view path)
     }
     if (FT_New_Face(this->freetype_library, path.data(), 0, &this->freetype_face))
     {
-        throw rl::font_exception(rl::font_exception::Error::FontLoadError);
+        throw rl::font_exception(rl::font_exception::Error::FontLoadFailure);
     }
 }
 
@@ -85,7 +85,7 @@ rl::BitmapView rl::Font::GetBitmapView() const
 {
     if (!this->IsLoaded())
     {
-        throw rl::font_exception(rl::font_exception::Error::GlyphLoadError);
+        throw rl::font_exception(rl::font_exception::Error::GlyphLoadFailure);
     }
     return 
         rl::BitmapView(

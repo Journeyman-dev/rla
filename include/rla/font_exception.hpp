@@ -33,14 +33,14 @@ namespace rl
             enum class Error
             {
                 FontNotLoaded = 1,
-                FreetypeInitializeError = 2,
-                FontLoadError = 3,
-                GlyphLoadError = 4,
+                FreetypeInitializeFailure = 2,
+                FontLoadFailure = 3,
+                GlyphLoadFailure = 4,
             };
 
         private:
-            rl::font_exception::Error error;
-
+            rl::font_exception::Error error = rl::font_exception::Error::FontNotLoaded;
+            
         public:
             font_exception(rl::font_exception::Error error) noexcept;
 

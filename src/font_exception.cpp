@@ -49,13 +49,13 @@ std::ostream& rl::operator<<(std::ostream& os, rl::font_exception::Error error)
         case rl::font_exception::Error::FontNotLoaded:
             os << "font not loaded";
             break;
-        case rl::font_exception::Error::FreetypeInitializeError:
+        case rl::font_exception::Error::FreetypeInitializeFailure:
             os << "error initializing freetype";
             break;
-        case rl::font_exception::Error::FontLoadError:
+        case rl::font_exception::Error::FontLoadFailure:
             os << "failed to load font";
             break;
-        case rl::font_exception::Error::GlyphLoadError:
+        case rl::font_exception::Error::GlyphLoadFailure:
             os << "failed to load glyph";
             break;
         default:
