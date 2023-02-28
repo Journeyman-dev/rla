@@ -27,7 +27,7 @@
 #include <optional>
 
 rl::MutableBitmapView::MutableBitmapView(
-    unsigned char* pixel_data,
+    rl::bitmap_byte_t* pixel_data,
     std::size_t width,
     std::size_t height,
     std::size_t page_count,
@@ -89,12 +89,12 @@ std::size_t rl::MutableBitmapView::GetPageOffset() const noexcept
     return this->page_offset;
 }
 
-const unsigned char* rl::MutableBitmapView::GetData() const noexcept
+const rl::bitmap_byte_t* rl::MutableBitmapView::GetData() const noexcept
 {
     return this->pixel_data;
 }
 
-unsigned char* rl::MutableBitmapView::GetMutableData() noexcept
+rl::bitmap_byte_t* rl::MutableBitmapView::GetMutableData() noexcept
 {
     return this->pixel_data;
 }

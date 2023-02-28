@@ -43,7 +43,7 @@ std::size_t rl::Bitmap::GetBitDepth() const noexcept
         );
 }
 
-const unsigned char* rl::Bitmap::GetData(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
+const rl::bitmap_byte_t* rl::Bitmap::GetData(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
 {
     const auto byte_index_o = this->GetByteIndex(x, y, page, channel);
     if (!byte_index_o.has_value())

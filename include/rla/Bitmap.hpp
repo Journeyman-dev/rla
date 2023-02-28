@@ -22,8 +22,7 @@
 
 #pragma once
 
-#include <rla/BitmapColor.hpp>
-#include <rla/BitmapDepth.hpp>
+#include <rla/bitmap_types.hpp>
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -45,8 +44,8 @@ namespace rl
             static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
             static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
             static constexpr void ConvertRow(
-                unsigned char* source,
-                unsigned char* destination,
+                rl::bitmap_byte_t* source,
+                rl::bitmap_byte_t* destination,
                 std::size_t width,
                 rl::BitmapDepth source_depth,
                 rl::BitmapColor source_color,
@@ -64,8 +63,8 @@ namespace rl
             std::size_t GetBitDepth() const noexcept;
             virtual std::size_t GetRowOffset() const noexcept;
             virtual std::size_t GetPageOffset() const noexcept;
-            virtual const unsigned char* GetData() const noexcept = 0;
-            const unsigned char* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
+            virtual const rl::bitmap_byte_t* GetData() const noexcept = 0;
+            const rl::bitmap_byte_t* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
             std::size_t GetChannelCount() const noexcept;
             std::size_t GetRowSize() const noexcept;
             std::size_t GetPageSize() const noexcept;

@@ -24,7 +24,7 @@
 #include <rla/Png.hpp>
 #include <rla/color_conversion.hpp>
 
-unsigned char* rl::Image::GetMutableData() noexcept
+rl::bitmap_byte_t* rl::Image::GetMutableData() noexcept
 {
     return this->data.data();
 }
@@ -54,7 +54,7 @@ rl::BitmapDepth rl::Image::GetDepth() const noexcept
     return this->depth;
 }
 
-const unsigned char* rl::Image::GetData() const noexcept
+const rl::bitmap_byte_t* rl::Image::GetData() const noexcept
 {
     return this->data.data();
 }

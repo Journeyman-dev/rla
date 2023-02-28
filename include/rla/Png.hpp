@@ -26,11 +26,16 @@
 #include <string>
 #include <cstddef>
 
+typedef png_struct * png_structp;
+typedef png_info * png_infop;
+
 namespace rl
 {
     class Png
     {
         private:
+            png_structp png = nullptr;
+            png_infop info = nullptr;
             std::string path = "";
             std::size_t width = 0;
             std::size_t height = 0;

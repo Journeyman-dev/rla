@@ -23,8 +23,7 @@
 #pragma once
 
 #include <rla/Bitmap.hpp>
-#include <rla/BitmapDepth.hpp>
-#include <rla/BitmapColor.hpp>
+#include <rla/bitmap_types.hpp>
 #include <cstddef>
 #include <optional>
 
@@ -33,7 +32,7 @@ namespace rl
     class BitmapView : public rl::Bitmap
     {
         private:
-            const unsigned char* pixel_data = nullptr;
+            const rl::bitmap_byte_t* pixel_data = nullptr;
             std::size_t width = 0;
             std::size_t height = 0;
             std::size_t page_count = 0;
@@ -45,7 +44,7 @@ namespace rl
         public:
             constexpr BitmapView() noexcept = default;
             BitmapView(
-                const unsigned char* pixel_data,
+                const rl::bitmap_byte_t* pixel_data,
                 std::size_t width,
                 std::size_t height,
                 std::size_t page_count,
@@ -64,6 +63,6 @@ namespace rl
             rl::BitmapColor GetColor() const noexcept override;
             std::size_t GetRowOffset() const noexcept override;
             std::size_t GetPageOffset() const noexcept override;
-            const unsigned char* GetData() const noexcept override;
+            const rl::bitmap_byte_t* GetData() const noexcept override;
     };
 }

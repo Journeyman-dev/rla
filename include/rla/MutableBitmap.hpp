@@ -23,6 +23,7 @@
 #pragma once
 
 #include <rla/Bitmap.hpp>
+#include <rla/bitmap_types.hpp>
 #include <rlm/cellular/cell_box2.hpp>
 #include <cstddef>
 

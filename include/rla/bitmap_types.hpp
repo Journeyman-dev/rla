@@ -22,9 +22,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
-
 namespace rl
 {
     enum class BitmapDepth
@@ -33,4 +30,14 @@ namespace rl
         Sexdecuple,
         Normalized
     };
+
+    enum class BitmapColor
+    {
+        G,
+        Ga,
+        Rgb,
+        Rgba
+    };
+
+    using bitmap_byte_t = unsigned char;
 }

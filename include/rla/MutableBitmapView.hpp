@@ -23,8 +23,7 @@
 #pragma once
 
 #include <rla/MutableBitmap.hpp>
-#include <rla/BitmapColor.hpp>
-#include <rla/BitmapDepth.hpp>
+#include <rla/bitmap_types.hpp>
 #include <cstddef>
 #include <optional>
 
@@ -46,7 +45,7 @@ namespace rl
         public:
             constexpr MutableBitmapView() noexcept = default;
             MutableBitmapView(
-                unsigned char* pixel_data,
+                rl::bitmap_byte_t pixel_data,
                 std::size_t width,
                 std::size_t height,
                 std::size_t page_count,
@@ -65,7 +64,7 @@ namespace rl
             rl::BitmapColor GetColor() const noexcept override;
             std::size_t GetRowOffset() const noexcept override;
             std::size_t GetPageOffset() const noexcept override;
-            const unsigned char* GetData() const noexcept override;
-            unsigned char* GetMutableData() noexcept override;
+            const rl::bitmap_byte_t* GetData() const noexcept override;
+            rl::bitmap_byte_t* GetMutableData() noexcept override;
     };
 }

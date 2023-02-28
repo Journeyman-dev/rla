@@ -22,8 +22,7 @@
 
 #pragma once
 
-#include <rla/BitmapDepth.hpp>
-#include <rla/BitmapColor.hpp>
+#include <rla/bitmap_types.hpp>
 #include <rla/MutableBitmap.hpp>
 #include <cstddef>
 #include <optional>
@@ -40,7 +39,7 @@ namespace rl
             std::size_t page_count = 0;
             rl::BitmapDepth depth = rl::BitmapDepth::Octuple;
             rl::BitmapColor color = rl::BitmapColor::Rgba;
-            std::vector<unsigned char> data = std::vector<unsigned char>();
+            std::vector<rl::bitmap_byte_t> data = std::vector<rl::bitmap_byte_t>();
 
         public:
             using rl::MutableBitmap::MutableBitmap;
@@ -50,8 +49,8 @@ namespace rl
             std::size_t GetHeight() const noexcept override;
             std::size_t GetPageCount() const noexcept override;
             rl::BitmapDepth GetDepth() const noexcept override;
-            unsigned char* GetMutableData() noexcept override;
-            const unsigned char* GetData() const noexcept override;
+            rl::bitmap_byte_t* GetMutableData() noexcept override;
+            const rl::bitmap_byte_t* GetData() const noexcept override;
             void Clear() noexcept;
             void ShrinkToFit();
             void Reserve(std::size_t bytes);

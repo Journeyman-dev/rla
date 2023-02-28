@@ -23,7 +23,7 @@
 #pragma once
 
 #include <rla/PngColor.hpp>
-#include <rla/BitmapColor.hpp>
+#include <rla/bitmap_types.hpp>
 
 namespace rl
 {
