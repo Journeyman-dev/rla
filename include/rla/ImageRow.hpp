@@ -22,24 +22,33 @@
 
 #pragma once
 
+#include <rla/MutableBitmapRow.hpp>
+#include <rla/bitmap_types.hpp>
+#include <vector>
+
 namespace rl
 {
-    enum class BitmapDepth
+    class ImageRow : public rl::MutableBitmapRow
     {
-        Octuple,
-        Sexdecuple,
-        Normalized,
-        Default = Octuple
-    };
+    private:
+        std::vector<rl::bitmap_byte_t> data = std::vector<rl::bitmap_byte_t>();
+        std::size_t width = 0;
+        rl::BitmapDepth depth = rl::BitmapDepth::Default;
+        rl::BitmapColor color = rl::BitmapColor::Default;
 
-    enum class BitmapColor
-    {
-        G,
-        Ga,
-        Rgb,
-        Rgba,
-        Default = Rgb
-    };
+    public:
+        using rl::MutableBitmapRow::MutableBitmapRow;
 
-    using bitmap_byte_t = unsigned char;
+        std::size_t GetWidth() const noexcept override;
+        rl::BitmapDepth GetDepth() const noexcept override;
+        rl::BitmapColor GetColor() const noexcept override;
+        const rl::bitmap_byte_t* GetData() const noexcept override;
+        rl::bitmap_byte_t* GetMutableData() noexcept override;
+        void Clear() noexcept;
+        void ShrinkToFit();
+        void Reserve(std::size_t capacity);
+        std::size_t GetCapacity() const noexcept;
+        void Create(std::size_t width, rl::BitmapDepth depth, rl::BitmapColor color);
+
+    };
 }

@@ -23,8 +23,7 @@
 #pragma once
 
 #include <rlm/concepts.hpp>
-#include <rla/BitmapColor.hpp>
-#include <rla/BitmapDepth.hpp>
+#include <rla/bitmap_types.hpp>
 #include <rlm/color/color_g.hpp>
 #include <rlm/color/color_ga.hpp>
 #include <rlm/color/color_rgb.hpp>

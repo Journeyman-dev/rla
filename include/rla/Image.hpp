@@ -37,8 +37,8 @@ namespace rl
             std::size_t width = 0;
             std::size_t height = 0;
             std::size_t page_count = 0;
-            rl::BitmapDepth depth = rl::BitmapDepth::Octuple;
-            rl::BitmapColor color = rl::BitmapColor::Rgba;
+            rl::BitmapDepth depth = rl::BitmapDepth::Default;
+            rl::BitmapColor color = rl::BitmapColor::Default;
             std::vector<rl::bitmap_byte_t> data = std::vector<rl::bitmap_byte_t>();
 
         public:

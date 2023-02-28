@@ -22,24 +22,17 @@
 
 #pragma once
 
+#include <rla/BitmapRow.hpp>
+#include <rla/bitmap_types.hpp>
+
 namespace rl
 {
-    enum class BitmapDepth
+    class MutableBitmapRow : public rl::BitmapRow
     {
-        Octuple,
-        Sexdecuple,
-        Normalized,
-        Default = Octuple
-    };
+        public:
+        using rl::BitmapRow::BitmapRow;
 
-    enum class BitmapColor
-    {
-        G,
-        Ga,
-        Rgb,
-        Rgba,
-        Default = Rgb
+        virtual rl::bitmap_byte_t* GetMutableData() noexcept = 0;
+        rl::bitmap_byte_t* GetMutableData(std::size_t x, std::size_t channel = 0) noexcept;
     };
-
-    using bitmap_byte_t = unsigned char;
 }

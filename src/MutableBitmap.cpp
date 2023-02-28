@@ -21,6 +21,8 @@
 */
 
 #include <rla/MutableBitmap.hpp>
+#include <rla/MutableBitmapView.hpp>
+#include <rla/MutableBitmapRowView.hpp>
 #include <rla/Png.hpp>
 #include "png_wrapper.h"
 #include "pngw_ext.hpp"
@@ -53,6 +55,45 @@ unsigned char* rl::MutableBitmap::GetMutableData(std::size_t x, std::size_t y, s
     return
         this->GetMutableData() +
         byte_index_o.value();
+}
+
+rl::MutableBitmapView rl::MutableBitmap::GetMutableView() noexcept
+{
+    return
+        this->GetMutableView(
+            0,
+            0,
+            0,
+            this->GetWidth(),
+            this->GetHeight(),
+            this->GetPageCount()
+        );
+}
+
+rl::MutableBitmapView rl::MutableBitmap::GetMutableView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count) noexcept
+{
+    return
+        rl::MutableBitmapView(
+            this->GetMutableData(x, y, page, 0),
+            width,
+            height,
+            page_count,
+            this->GetDepth(),
+            this->GetColor(),
+            this->GetRowOffset(),
+            this->GetPageOffset()
+        );
+}
+
+rl::MutableBitmapRowView rl::MutableBitmap::GetMutableRowView(std::size_t y, std::size_t page) noexcept
+{
+    return
+        rl::MutableBitmapRowView(
+            this->GetMutableData(0, y, page, 0),
+            this->GetWidth(),
+            this->GetDepth(),
+            this->GetColor()
+        );
 }
 
 void rl::MutableBitmap::BlitBitmap(const rl::Bitmap& bitmap, std::size_t x, std::size_t y, std::size_t page)

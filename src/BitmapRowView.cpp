@@ -20,26 +20,38 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
+#include <rla/BitmapRowView.hpp>
+#include <rla/bitmap_types.hpp>
 
-namespace rl
+rl::BitmapRowView::BitmapRowView(
+    const rl::bitmap_byte_t* row_start,
+    std::size_t width,
+    rl::BitmapDepth depth,
+    rl::BitmapColor color
+) noexcept
+    : row_start(row_start)
+    , width(width)
+    , depth(depth)
+    , color(color)
 {
-    enum class BitmapDepth
-    {
-        Octuple,
-        Sexdecuple,
-        Normalized,
-        Default = Octuple
-    };
+}
 
-    enum class BitmapColor
-    {
-        G,
-        Ga,
-        Rgb,
-        Rgba,
-        Default = Rgb
-    };
+std::size_t rl::BitmapRowView::GetWidth() const noexcept
+{
+    return this->width;
+}
 
-    using bitmap_byte_t = unsigned char;
+rl::BitmapDepth rl::BitmapRowView::GetDepth() const noexcept
+{
+    return this->depth;
+}
+
+rl::BitmapColor rl::BitmapRowView::GetColor() const noexcept
+{
+    return this->color;
+}
+
+const rl::bitmap_byte_t* rl::BitmapRowView::GetData() const noexcept
+{
+    return this->row_start;
 }

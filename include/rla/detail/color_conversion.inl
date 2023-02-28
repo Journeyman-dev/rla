@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <rla/BitmapColor.hpp>
+#include <rla/bitmap_types.hpp>
 #include <rla/PngColor.hpp>
 
 constexpr rl::PngColor rl::to_png_color(rl::BitmapColor color) noexcept

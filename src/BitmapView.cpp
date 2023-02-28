@@ -22,7 +22,7 @@
 
 #include <rla/BitmapView.hpp>
 #include <rla/Bitmap.hpp>
-#include <rla/BitmapColor.hpp>
+#include <rla/bitmap_types.hpp>
 #include <cstddef>
 #include <optional>
 

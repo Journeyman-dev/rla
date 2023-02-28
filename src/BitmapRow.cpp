@@ -20,36 +20,64 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
-
-#include <rla/MutableBitmapRow.hpp>
+#include <rla/BitmapRow.hpp>
+#include <rla/Bitmap.hpp>
 #include <rla/bitmap_types.hpp>
+#include <cstddef>
+#include <optional>
 
-namespace rl
+const rl::bitmap_byte_t* rl::BitmapRow::GetData(std::size_t x, std::size_t channel) const noexcept
 {
-    class MutableBitmapRowView : public rl::MutableBitmapRow
+    const auto byte_index_o = this->GetByteIndex(x, channel);
+    if (!byte_index_o.has_value())
     {
-    private:
-        rl::bitmap_byte_t* row_start;
-        std::size_t width = 0;
-        rl::BitmapDepth depth = rl::BitmapDepth::Default;
-        rl::BitmapColor color = rl::BitmapColor::Default;
+        return nullptr;
+    }
+    return
+        this->GetData() +
+        byte_index_o.value();
+}
 
-    public:
-        using MutableBitmapRow::MutableBitmapRow;
+std::size_t rl::BitmapRow::GetChannelSize() const noexcept
+{
+    return
+        rl::Bitmap::GetChannelSize(
+            this->GetDepth()
+        );
+}
 
-        MutableBitmapRowView() noexcept = default;
-        MutableBitmapRowView(
-            rl::bitmap_byte_t* row_start,
-            std::size_t width,
-            rl::BitmapDepth depth,
-            rl::BitmapColor color
-        ) noexcept;
+std::size_t rl::BitmapRow::GetBitDepth() const noexcept
+{
+    return
+        rl::Bitmap::GetBitDepth(
+            this->GetDepth()
+        );
+}
 
-        std::size_t GetWidth() const noexcept override;
-        rl::BitmapDepth GetDepth() const noexcept override;
-        rl::BitmapColor GetColor() const noexcept override;
-        const rl::bitmap_byte_t* GetData() const noexcept override;
-        rl::bitmap_byte_t* GetMutableData() noexcept override;
-    };
+std::size_t rl::BitmapRow::GetSize() const noexcept
+{
+    return
+        rl::Bitmap::GetRowSize(
+            this->GetWidth(),
+            this->GetDepth(),
+            this->GetColor()
+        );
+}
+
+std::optional<std::size_t> rl::BitmapRow::GetByteIndex(std::size_t x, std::size_t channel) const noexcept
+{
+    return
+        rl::Bitmap::GetByteIndex(
+            this->GetWidth(),
+            0,
+            0,
+            this->GetDepth(),
+            this->GetColor(),
+            0,
+            0,
+            x,
+            0,
+            0,
+            channel
+        );
 }

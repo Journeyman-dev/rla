@@ -30,6 +30,7 @@
 namespace rl
 {
     class BitmapView;
+    class BitmapRowView;
 
     class Bitmap
     {
@@ -73,6 +74,7 @@ namespace rl
             bool GetIsEmpty() const noexcept;
             rl::BitmapView GetView() const noexcept;
             rl::BitmapView GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count) const noexcept;
+            rl::BitmapRowView GetRowView(std::size_t y, std::size_t page) const noexcept;
             void SavePng(std::string_view path, std::size_t page = 0);
     };
 }

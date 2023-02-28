@@ -20,26 +20,19 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
+#include <rla/MutableBitmapRow.hpp>
+#include <rla/bitmap_types.hpp>
+#include <cstddef>
+#include <optional>
 
-namespace rl
+rl::bitmap_byte_t* rl::MutableBitmapRow::GetMutableData(std::size_t x, std::size_t channel) noexcept
 {
-    enum class BitmapDepth
+    const auto byte_index_o = this->GetByteIndex(x, channel);
+    if (!byte_index_o.has_value())
     {
-        Octuple,
-        Sexdecuple,
-        Normalized,
-        Default = Octuple
-    };
-
-    enum class BitmapColor
-    {
-        G,
-        Ga,
-        Rgb,
-        Rgba,
-        Default = Rgb
-    };
-
-    using bitmap_byte_t = unsigned char;
+        return nullptr;
+    }
+    return
+        this->GetMutableData() +
+        byte_index_o.value();
 }

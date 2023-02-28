@@ -21,8 +21,10 @@
 */
 
 #include <rla/Bitmap.hpp>
+#include <rla/bitmap_types.hpp>
 #include <rla/bitmap_exception.hpp>
 #include <rla/BitmapView.hpp>
+#include <rla/BitmapRowView.hpp>
 #include <cstddef>
 #include "png_wrapper.h"
 #include "pngw_ext.hpp"
@@ -152,6 +154,17 @@ rl::BitmapView rl::Bitmap::GetView(std::size_t x, std::size_t y, std::size_t pag
         );
 }
 
+rl::BitmapRowView rl::Bitmap::GetRowView(std::size_t y, std::size_t page) const noexcept
+{
+    return
+        rl::BitmapRowView(
+            this->GetData(0, y, page, 0),
+            this->GetWidth(),
+            this->GetDepth(),
+            this->GetColor()
+        );
+}
+
 void rl::Bitmap::SavePng(std::string_view path, std::size_t page)
 {
     pngwresult_t result = pngwWriteFile(
@@ -167,4 +180,9 @@ void rl::Bitmap::SavePng(std::string_view path, std::size_t page)
     {
         throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
     }
+}
+
+bool rl::Bitmap::GetIsEmpty() const noexcept
+{
+    return this->GetData() == nullptr;
 }

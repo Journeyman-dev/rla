@@ -22,24 +22,24 @@
 
 #pragma once
 
+#include <rla/bitmap_types.hpp>
+#include <cstddef>
+#include <optional>
+
 namespace rl
 {
-    enum class BitmapDepth
+    class BitmapRow
     {
-        Octuple,
-        Sexdecuple,
-        Normalized,
-        Default = Octuple
+    public:
+        virtual std::size_t GetWidth() const noexcept = 0;
+        virtual rl::BitmapDepth GetDepth() const noexcept = 0;
+        virtual rl::BitmapColor GetColor() const noexcept = 0;
+        virtual const rl::bitmap_byte_t* GetData() const noexcept = 0;
+        const rl::bitmap_byte_t* GetData(std::size_t x, std::size_t channel = 0) const noexcept;
+        std::size_t GetChannelSize() const noexcept;
+        std::size_t GetBitDepth() const noexcept;
+        std::size_t GetSize() const noexcept;
+        std::optional<std::size_t> GetByteIndex(std::size_t x, std::size_t channel = 0) const noexcept;
+        
     };
-
-    enum class BitmapColor
-    {
-        G,
-        Ga,
-        Rgb,
-        Rgba,
-        Default = Rgb
-    };
-
-    using bitmap_byte_t = unsigned char;
 }

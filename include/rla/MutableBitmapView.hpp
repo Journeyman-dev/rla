@@ -37,15 +37,17 @@ namespace rl
             std::size_t width = 0;
             std::size_t height = 0;
             std::size_t page_count = 0;
-            rl::BitmapDepth depth = rl::BitmapDepth::Octuple;
-            rl::BitmapColor color = rl::BitmapColor::Rgb;
+            rl::BitmapDepth depth = rl::BitmapDepth::Default;
+            rl::BitmapColor color = rl::BitmapColor::Default;
             std::size_t row_offset = 0;
             std::size_t page_offset = 0;
 
         public:
+            using rl::MutableBitmap::MutableBitmap;
+
             constexpr MutableBitmapView() noexcept = default;
             MutableBitmapView(
-                rl::bitmap_byte_t pixel_data,
+                rl::bitmap_byte_t* pixel_data,
                 std::size_t width,
                 std::size_t height,
                 std::size_t page_count,
@@ -54,8 +56,6 @@ namespace rl
                 std::optional<std::size_t> row_offset_o = std::nullopt,
                 std::optional<std::size_t> page_offset_o = std::nullopt
             ) noexcept;
-
-            using rl::MutableBitmap::MutableBitmap;
 
             std::size_t GetWidth() const noexcept override;
             std::size_t GetHeight() const noexcept override;
