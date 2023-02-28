@@ -44,14 +44,14 @@ std::size_t rl::Image::GetHeight() const noexcept
     return this->height;
 }
 
-std::size_t rl::Image::GetPages() const noexcept
+std::size_t rl::Image::GetPageCount() const noexcept
 {
-    return this->pages;
+    return this->page_count;
 }
 
-std::size_t rl::Image::GetChannelSize() const noexcept
+rl::BitmapDepth rl::Image::GetDepth() const noexcept
 {
-    return this->channel_size;
+    return this->depth;
 }
 
 const unsigned char* rl::Image::GetData() const noexcept
@@ -64,9 +64,9 @@ void rl::Image::Clear() noexcept
     this->data.clear();
     this->width = 0;
     this->height = 0;
-    this->pages = 0;
-    this->channel_size = 1;
-    this->color = rl::BitmapColor::Rgba;
+    this->page_count = 0;
+    this->depth = rl::BitmapDepth::Octuple;
+    this->color = rl::BitmapColor::Rgb;
 }
 
 void rl::Image::ShrinkToFit()
@@ -79,41 +79,41 @@ void rl::Image::Reserve(std::size_t bytes)
     this->data.reserve(bytes);
 }
 
-void rl::Image::Create(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color)
+void rl::Image::Create(std::size_t width, std::size_t height, std::size_t page_count, rl::BitmapDepth depth, rl::BitmapColor color)
 {
     this->Clear();
     const auto size = 
         rl::Bitmap::GetSize(
             width,
             height,
-            pages,
-            channel_size,
+            page_count,
+            depth,
             color
         );
     this->data.resize(size, 0);
     this->width = width;
     this->height = height;
-    this->pages = pages;
+    this->page_count = page_count;
     this->color = color;
-    this->channel_size = channel_size;
+    this->depth = depth;
 }
 
-void rl::Image::LoadPng(const rl::Png& png, std::optional<std::size_t> channel_size_o, std::optional<rl::BitmapColor> color_o)
+void rl::Image::LoadPng(const rl::Png& png, std::optional<rl::BitmapDepth> depth_o, std::optional<rl::BitmapColor> color_o)
 {
     const auto color = 
         color_o.value_or(
             rl::to_bitmap_color(png.GetColor())
         );
-    const auto channel_size =
-        channel_size_o.value_or(
-            rl::Bitmap::GetChannelSize(png.GetBitDepth())
+    const auto depth =
+        depth_o.value_or(
+            rl::Bitmap::GetDepth(png.GetBitDepth())
         );
-    this->Create(png.GetWidth(), png.GetHeight(), 1, channel_size, color);
+    this->Create(png.GetWidth(), png.GetHeight(), 1, depth, color);
     this->BlitPng(png, 0, 0, 0);
 }
 
-void rl::Image::LoadPng(std::string_view path, std::optional<std::size_t> channel_size_o, std::optional<rl::BitmapColor> color_o)
+void rl::Image::LoadPng(std::string_view path, std::optional<rl::BitmapDepth> depth_o, std::optional<rl::BitmapColor> color_o)
 {
     const auto png = rl::Png(path);
-    this->LoadPng(png, channel_size_o, color_o);
+    this->LoadPng(png, depth_o, color_o);
 }

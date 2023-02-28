@@ -24,6 +24,7 @@
 
 #include <rla/MutableBitmap.hpp>
 #include <rla/BitmapColor.hpp>
+#include <rla/BitmapDepth.hpp>
 #include <cstddef>
 #include <optional>
 
@@ -36,8 +37,8 @@ namespace rl
 
             std::size_t width = 0;
             std::size_t height = 0;
-            std::size_t pages = 0;
-            std::size_t channel_size = 1;
+            std::size_t page_count = 0;
+            rl::BitmapDepth depth = rl::BitmapDepth::Octuple;
             rl::BitmapColor color = rl::BitmapColor::Rgb;
             std::size_t row_offset = 0;
             std::size_t page_offset = 0;
@@ -48,8 +49,8 @@ namespace rl
                 unsigned char* pixel_data,
                 std::size_t width,
                 std::size_t height,
-                std::size_t pages,
-                std::size_t channel_size,
+                std::size_t page_count,
+                rl::BitmapDepth depth,
                 rl::BitmapColor color,
                 std::optional<std::size_t> row_offset_o = std::nullopt,
                 std::optional<std::size_t> page_offset_o = std::nullopt
@@ -59,8 +60,8 @@ namespace rl
 
             std::size_t GetWidth() const noexcept override;
             std::size_t GetHeight() const noexcept override;
-            std::size_t GetPages() const noexcept override;
-            std::size_t GetChannelSize() const noexcept override;
+            std::size_t GetPageCount() const noexcept override;
+            rl::BitmapDepth GetDepth() const noexcept override;
             rl::BitmapColor GetColor() const noexcept override;
             std::size_t GetRowOffset() const noexcept override;
             std::size_t GetPageOffset() const noexcept override;

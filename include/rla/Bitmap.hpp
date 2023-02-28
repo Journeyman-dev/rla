@@ -23,6 +23,7 @@
 #pragma once
 
 #include <rla/BitmapColor.hpp>
+#include <rla/BitmapDepth.hpp>
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -35,28 +36,30 @@ namespace rl
     {
         public:
             static constexpr std::size_t GetChannelCount(rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetChannelSize(std::size_t bit_depth) noexcept;
-            static constexpr std::size_t GetBitDepth(std::size_t channel_size) noexcept;
-            static constexpr std::size_t GetPixelSize(std::size_t channel_size, rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetRowSize(std::size_t width, std::size_t channel_size, rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, std::size_t channel_size, rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color) noexcept;
-            static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
+            static constexpr std::size_t GetChannelSize(rl::BitmapDepth depth) noexcept;
+            static constexpr std::size_t GetBitDepth(rl::BitmapDepth depth) noexcept;
+            static constexpr rl::BitmapDepth GetDepth(std::size_t bit_depth) noexcept;
+            static constexpr std::size_t GetPixelSize(rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
+            static constexpr std::size_t GetRowSize(std::size_t width, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
+            static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
+            static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
+            static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
             static constexpr void ConvertRow(
                 unsigned char* source,
                 unsigned char* destination,
                 std::size_t width,
-                std::size_t source_channel_size,
+                rl::BitmapDepth source_depth,
                 rl::BitmapColor source_color,
-                std::size_t destination_channel_size,
+                rl::BitmapDepth destination_depth,
                 rl::BitmapColor destination_color
             ) noexcept;
 
         public:
             virtual std::size_t GetWidth() const noexcept = 0;
             virtual std::size_t GetHeight() const noexcept = 0;
-            virtual std::size_t GetPages() const noexcept = 0;
-            virtual std::size_t GetChannelSize() const noexcept = 0;
+            virtual std::size_t GetPageCount() const noexcept = 0;
+            std::size_t GetChannelSize() const noexcept;
+            virtual rl::BitmapDepth GetDepth() const noexcept = 0;
             virtual rl::BitmapColor GetColor() const noexcept = 0;
             std::size_t GetBitDepth() const noexcept;
             virtual std::size_t GetRowOffset() const noexcept;
@@ -70,7 +73,7 @@ namespace rl
             std::optional<std::size_t> GetByteIndex(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
             bool GetIsEmpty() const noexcept;
             rl::BitmapView GetView() const noexcept;
-            rl::BitmapView GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t pages) const noexcept;
+            rl::BitmapView GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count) const noexcept;
             void SavePng(std::string_view path, std::size_t page = 0);
     };
 }

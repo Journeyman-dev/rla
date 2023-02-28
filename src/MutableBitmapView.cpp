@@ -30,25 +30,25 @@ rl::MutableBitmapView::MutableBitmapView(
     unsigned char* pixel_data,
     std::size_t width,
     std::size_t height,
-    std::size_t pages,
-    std::size_t channel_size,
+    std::size_t page_count,
+    rl::BitmapDepth depth,
     rl::BitmapColor color,
     std::optional<std::size_t> row_offset_o,
     std::optional<std::size_t> page_offset_o
 ) noexcept
     : width(width)
     , height(height)
-    , pages(pages)
-    , channel_size(channel_size)
+    , page_count(page_count)
+    , depth(depth)
     , color(color)
     , row_offset(
         row_offset_o.value_or(
-            rl::Bitmap::GetRowSize(width, channel_size, color)
+            rl::Bitmap::GetRowSize(width, depth, color)
         )
     )
     , page_offset(
         page_offset_o.value_or(
-            rl::Bitmap::GetPageSize(width, height, channel_size, color)
+            rl::Bitmap::GetPageSize(width, height, depth, color)
         )
     )
 {
@@ -64,14 +64,14 @@ std::size_t rl::MutableBitmapView::GetHeight() const noexcept
     return this->height;
 }
 
-std::size_t rl::MutableBitmapView::GetPages() const noexcept
+std::size_t rl::MutableBitmapView::GetPageCount() const noexcept
 {
-    return this->pages;
+    return this->page_count;
 }
 
-std::size_t rl::MutableBitmapView::GetChannelSize() const noexcept
+rl::BitmapDepth rl::MutableBitmapView::GetDepth() const noexcept
 {
-    return this->channel_size;
+    return this->depth;
 }
 
 rl::BitmapColor rl::MutableBitmapView::GetColor() const noexcept

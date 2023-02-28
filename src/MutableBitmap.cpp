@@ -39,7 +39,7 @@ bool rl::MutableBitmap::blit_fits(const rl::cell_box2<int>& blit_box, std::size_
         static_cast<int>(this->GetHeight())
     );
     return 
-        page < this->GetPages() &&
+        page < this->GetPageCount() &&
         rl::does_contain(this_box, blit_box);
 }
 
@@ -71,7 +71,7 @@ void rl::MutableBitmap::BlitBitmap(const rl::Bitmap& bitmap, std::size_t x, std:
     {
         throw rl::bitmap_exception(rl::bitmap_exception::Error::BlitOutOfBitmap);
     }
-    for (std::size_t blit_page = 0; blit_page < bitmap.GetPages(); blit_page++)
+    for (std::size_t blit_page = 0; blit_page < bitmap.GetPageCount(); blit_page++)
     {
         for (std::size_t blit_y = 0; blit_y < bitmap.GetHeight(); blit_y++)
         {

@@ -115,7 +115,7 @@ rl::BitmapView rl::Font::GetBitmapView() const
             this->freetype_face->glyph->bitmap.width,
             this->freetype_face->glyph->bitmap.rows,
             1,
-            1,
+            rl::BitmapDepth::Octuple,
             rl::BitmapColor::G,
             std::nullopt,
             std::nullopt

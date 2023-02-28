@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <rla/BitmapDepth.hpp>
 #include <rla/BitmapColor.hpp>
 #include <rla/MutableBitmap.hpp>
 #include <cstddef>
@@ -36,9 +37,9 @@ namespace rl
         private:
             std::size_t width = 0;
             std::size_t height = 0;
-            std::size_t pages = 0;
+            std::size_t page_count = 0;
+            rl::BitmapDepth depth = rl::BitmapDepth::Octuple;
             rl::BitmapColor color = rl::BitmapColor::Rgba;
-            std::size_t channel_size = 1;
             std::vector<unsigned char> data = std::vector<unsigned char>();
 
         public:
@@ -47,15 +48,16 @@ namespace rl
             rl::BitmapColor GetColor() const noexcept override;
             std::size_t GetWidth() const noexcept override;
             std::size_t GetHeight() const noexcept override;
-            std::size_t GetPages() const noexcept override;
-            std::size_t GetChannelSize() const noexcept override;
+            std::size_t GetPageCount() const noexcept override;
+            rl::BitmapDepth GetDepth() const noexcept override;
             unsigned char* GetMutableData() noexcept override;
             const unsigned char* GetData() const noexcept override;
             void Clear() noexcept;
             void ShrinkToFit();
             void Reserve(std::size_t bytes);
-            void Create(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color);
-            void LoadPng(const rl::Png& png, std::optional<std::size_t> channel_size_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
-            void LoadPng(std::string_view path, std::optional<std::size_t> channel_size_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
+            std::size_t GetCapacity() const noexcept;
+            void Create(std::size_t width, std::size_t height, std::size_t page_count, rl::BitmapDepth depth, rl::BitmapColor color);
+            void LoadPng(const rl::Png& png, std::optional<rl::BitmapDepth> depth_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
+            void LoadPng(std::string_view path, std::optional<rl::BitmapDepth> depth_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
     };
 }
