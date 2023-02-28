@@ -43,7 +43,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     rlm
     GIT_REPOSITORY https://github.com/Journeyman-dev/rlm
-    GIT_TAG        v0.3.0
+    GIT_TAG        v0.3.0.1
 )
 FetchContent_Declare(
     freetype
