@@ -42,6 +42,15 @@ namespace rl
             static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, std::size_t channel_size, rl::BitmapColor color) noexcept;
             static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color) noexcept;
             static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, std::size_t channel_size, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
+            static constexpr void ConvertRow(
+                unsigned char* source,
+                unsigned char* destination,
+                std::size_t width,
+                std::size_t source_channel_size,
+                rl::BitmapColor source_color,
+                std::size_t destination_channel_size,
+                rl::BitmapColor destination_color
+            ) noexcept;
 
         public:
             virtual std::size_t GetWidth() const noexcept = 0;
