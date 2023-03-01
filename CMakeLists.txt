@@ -46,16 +46,22 @@ FetchContent_Declare(
     GIT_TAG        v0.3.0.1
 )
 FetchContent_Declare(
+    rld
+    GIT_REPOSITORY https://github.com/Journeyman-dev/rld
+    GIT_TAG        v0.0.0
+)
+FetchContent_Declare(
     freetype
     GIT_REPOSITORY https://github.com/freetype/freetype
     GIT_TAG        VER-2-13-0
 )
-FetchContent_MakeAvailable(png rlm freetype)
+FetchContent_MakeAvailable(png rlm rld freetype)
 target_link_libraries(
     ${PROJECT_NAME}
         PRIVATE
             png
             rlm::rlm
+            rld::rld
             freetype-interface
 )
 target_include_directories(
