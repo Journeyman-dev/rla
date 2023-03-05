@@ -24,8 +24,8 @@
 
 #include <rla/bitmap_types.hpp>
 #include <cstddef>
-#include <optional>
 #include <string>
+#include <optional>
 
 namespace rl
 {
@@ -68,6 +68,7 @@ namespace rl
             const rl::bitmap_byte_t* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
             std::size_t GetChannelCount() const noexcept;
             std::size_t GetRowSize() const noexcept;
+            std::size_t GetPixelSize() const noexcept;
             std::size_t GetPageSize() const noexcept;
             std::size_t GetSize() const noexcept;
             std::optional<std::size_t> GetByteIndex(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;

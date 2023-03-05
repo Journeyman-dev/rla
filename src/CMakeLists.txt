@@ -20,7 +20,6 @@
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        "bitmap_exception.cpp"
         "Bitmap.cpp"
         "BitmapRow.cpp"
         "BitmapRowView.cpp"
@@ -34,6 +33,5 @@ target_sources(${PROJECT_NAME}
         "MutableBitmapRowView.cpp"
         "MutableBitmapView.cpp"
         "Png.cpp"
-        "pngw_ext.cpp"
-        "pngw_impl.cpp"
+        "libpng_ext.cpp"
 )

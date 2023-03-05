@@ -34,5 +34,6 @@ namespace rl
 
         virtual rl::bitmap_byte_t* GetMutableData() noexcept = 0;
         rl::bitmap_byte_t* GetMutableData(std::size_t x, std::size_t channel = 0) noexcept;
+        void BlitRow(const rl::BitmapRow& row);
     };
 }

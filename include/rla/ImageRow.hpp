@@ -49,6 +49,5 @@ namespace rl
         void Reserve(std::size_t capacity);
         std::size_t GetCapacity() const noexcept;
         void Create(std::size_t width, rl::BitmapDepth depth, rl::BitmapColor color);
-
     };
 }

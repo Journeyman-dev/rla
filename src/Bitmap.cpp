@@ -22,12 +22,13 @@
 
 #include <rla/Bitmap.hpp>
 #include <rla/bitmap_types.hpp>
-#include <rla/bitmap_exception.hpp>
 #include <rla/BitmapView.hpp>
 #include <rla/BitmapRowView.hpp>
+#include <rld/except.hpp>
+#include "libpng_ext.hpp"
+#include <png.h>
 #include <cstddef>
-#include "png_wrapper.h"
-#include "pngw_ext.hpp"
+#include <fstream>
 
 std::size_t rl::Bitmap::GetChannelSize() const noexcept
 {
@@ -70,6 +71,15 @@ std::size_t rl::Bitmap::GetRowSize() const noexcept
     return
         rl::Bitmap::GetRowSize(
             this->GetWidth(),
+            this->GetDepth(),
+            this->GetColor()
+        );
+}
+
+std::size_t rl::Bitmap::GetPixelSize() const noexcept
+{
+    return
+        rl::Bitmap::GetPixelSize(
             this->GetDepth(),
             this->GetColor()
         );
@@ -167,19 +177,42 @@ rl::BitmapRowView rl::Bitmap::GetRowView(std::size_t y, std::size_t page) const 
 
 void rl::Bitmap::SavePng(std::string_view path, std::size_t page)
 {
-    pngwresult_t result = pngwWriteFile(
-        path.data(),
-        this->GetData(0, 0, page, 0),
-        PNGW_DEFAULT_ROW_OFFSET,
-        this->GetWidth(),
-        this->GetHeight(),
-        this->GetBitDepth(),
-        PNGW_COLOR_RGBA
-    );
-    if (result != PNGW_RESULT_OK)
+    if (page >= this->GetPageCount())
     {
-        throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
+        throw rl::runtime_error("save page out of bitmap");
     }
+    png_structp png_ptr = nullptr;
+    png_infop info_ptr = nullptr;
+    std::ofstream file;
+    try
+    {
+        rl::libpng_write_open(path, png_ptr, info_ptr, file);
+        if (setjmp(png_jmpbuf(png_ptr)))
+        {
+            throw rl::runtime_error("libpng jump buffer called");
+        }
+        rl::libpng_set_write_fn(png_ptr, file);
+        const auto png_color = rl::bitmap_color_to_libpng_color(this->GetColor());
+        // if the depth is normalized, need to convert each row while writing to a depth that libpng supports
+        if (this->GetDepth() == rl::BitmapDepth::Normalized)
+        {
+            png_set_IHDR(
+                png_ptr,
+                info_ptr,
+                static_cast<png_uint_32>(this->GetWidth()),
+                static_cast<png_uint_32>(this->GetHeight()),
+                16,
+                png_color,
+                PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+        }
+
+    }
+    catch(const std::exception& e)
+    {
+        rl::libpng_write_close(png_ptr, info_ptr, file);
+        throw e;
+    }
+    
 }
 
 bool rl::Bitmap::GetIsEmpty() const noexcept

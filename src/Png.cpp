@@ -21,9 +21,13 @@
 */
 
 #include <rla/Png.hpp>
-#include <rla/bitmap_exception.hpp>
-#include "png_wrapper.h"
-#include "pngw_ext.hpp"
+#include <rld/except.hpp>
+#include "libpng_ext.hpp"
+#include <fstream>
+#include <array>
+#include <string>
+#include <png.h>
+#include <rld/log.hpp>
 
 rl::Png::Png(std::string_view path)
 {
@@ -32,18 +36,25 @@ rl::Png::Png(std::string_view path)
 
 void rl::Png::Load(std::string_view path)
 {
-    std::size_t width, height, bit_depth;
-    pngwcolor_t color;
-    pngwresult_t result = pngwFileInfo(path.data(), &width, &height, &bit_depth, &color);
-    if (result != PNGW_RESULT_OK)
+    png_structp png_ptr = nullptr;
+    png_infop info_ptr = nullptr;
+    std::ifstream file;
+    rl::libpng_read_open(path, png_ptr, info_ptr, file);
+    if (setjmp(png_jmpbuf(png_ptr)))
     {
-        throw rl::bitmap_exception(rl::pngw_result_to_bitmap_exception_error(result));
+        rl::libpng_read_close(png_ptr, info_ptr, file);
+        throw rl::runtime_error("libpng jump buffer called");
     }
+    rl::libpng_set_read_fn(png_ptr, file);
+    png_uint_32 png_width, png_height;
+    int png_bit_depth, png_color_type;
+    rl::libpng_read_file_info(png_ptr, info_ptr, png_width, png_height, png_bit_depth, png_color_type);
+    rl::libpng_read_close(png_ptr, info_ptr, file);
     this->path = path;
-    this->width = width;
-    this->height = height;
-    this->color = rl::pngw_color_to_png_color(color);
-    this->bit_depth = bit_depth;
+    this->width = static_cast<std::size_t>(png_width);
+    this->height = static_cast<std::size_t>(png_height);
+    this->color = rl::libpng_color_to_png_color(png_color_type);
+    this->bit_depth = static_cast<std::size_t>(bit_depth);
 }
 
 bool rl::Png::GetEmpty() const noexcept

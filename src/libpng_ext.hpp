@@ -20,43 +20,26 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <rla/bitmap_exception.hpp>
-#include "png_wrapper.h"
-#include <ostream>
-#include <sstream>
+#pragma once
 
-rl::bitmap_exception::bitmap_exception(rl::bitmap_exception::Error error) noexcept
-    : error(error)
-{}
+#include <rla/PngColor.hpp>
+#include <rla/bitmap_types.hpp>
+#include <png.h>
+#include <fstream>
+#include <string>
 
-const char* rl::bitmap_exception::what() const noexcept
+#define RL_PNG_SIGNATURE_SIZE 8
+
+namespace rl
 {
-    std::stringstream ss("");
-    ss << "png load or save error: \"" << this->error << "\"";
-    return ss.str().data();
-}
-
-rl::bitmap_exception::Error rl::bitmap_exception::get_error() const noexcept
-{
-    return this->error;
-}
-
-std::ostream& rl::operator<<(std::ostream& os, rl::bitmap_exception::Error error)
-{
-    if (error == rl::bitmap_exception::Error::BlitOutOfBitmap)
-    {
-        // This error is not from png_wrapper.h
-        os << "blit out of bitmap";
-    }
-    else if (
-        static_cast<pngwresult_t>(error) >= PNGW_RESULT_OK &&
-        static_cast<pngwresult_t>(error) < PNGW_RESULT_COUNT)
-    {
-        os << PNGW_RESULT_DESCRIPTIONS[static_cast<pngwresult_t>(error)];
-    }
-    else
-    {
-        os << "unkown error";
-    }
-    return os;
+    rl::PngColor libpng_color_to_png_color(int png_color) noexcept;
+    int bitmap_color_to_libpng_color(rl::BitmapColor bitmap_color) noexcept;
+    void libpng_read_close(png_structp& png_ptr, png_infop& info_ptr, std::ifstream& file);
+    void libpng_read_open(std::string_view path, png_structp& png_ptr, png_infop& info_ptr, std::ifstream& file);
+    void libpng_set_read_fn(png_structp& png_ptr, std::ifstream& file);
+    void libpng_read_file_info(png_structp& png_ptr, png_infop& info_ptr, png_uint_32& png_width, png_uint_32& png_height, int& png_bit_depth, int& png_color_type);
+    void libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int png_bit_depth, int png_color_type, rl::BitmapDepth depth, rl::BitmapColor color);
+    void libpng_write_open(std::string_view path, png_structp& png_ptr, png_infop& info_ptr, std::ofstream& file);
+    void libpng_write_close(png_structp& png_ptr, png_infop& info_ptr, std::ofstream& file);
+    void libpng_set_write_fn(png_structp& png_ptr, std::ofstream& file);
 }

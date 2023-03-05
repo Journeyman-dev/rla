@@ -21,7 +21,10 @@
 */
 
 #include <rla/MutableBitmapRowView.hpp>
+#include <rla/Bitmap.hpp>
+#include <rla/BitmapRow.hpp>
 #include <rla/bitmap_types.hpp>
+
 
 rl::MutableBitmapRowView::MutableBitmapRowView(
     rl::bitmap_byte_t* row_start,

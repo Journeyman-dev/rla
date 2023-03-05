@@ -26,7 +26,7 @@
 #include <rla/bitmap_types.hpp>
 #include <rlm/cellular/cell_box2.hpp>
 #include <cstddef>
-
+#include <optional>
 
 namespace rl
 {
@@ -47,6 +47,7 @@ namespace rl
             rl::MutableBitmapView GetMutableView() noexcept;
             rl::MutableBitmapView GetMutableView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count) noexcept;
             rl::MutableBitmapRowView GetMutableRowView(std::size_t y, std::size_t page) noexcept;
+            rl::MutableBitmapRowView GetModifiedMutableRowView(std::size_t y, std::size_t page, std::optional<rl::BitmapDepth> depth_o, std::optional<rl::BitmapColor> color_o);
             void BlitBitmap(const rl::Bitmap& bitmap, std::size_t x, std::size_t y, std::size_t page);
             void BlitPng(const rl::Png& png, std::size_t x, std::size_t y, std::size_t page);
             void BlitPng(std::string_view path, std::size_t x, std::size_t y, std::size_t page);

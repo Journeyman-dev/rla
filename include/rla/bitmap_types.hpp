@@ -26,18 +26,18 @@ namespace rl
 {
     enum class BitmapDepth
     {
-        Octuple,
-        Sexdecuple,
-        Normalized,
+        Octuple = 0,
+        Sexdecuple = 1,
+        Normalized = 2,
         Default = Octuple
     };
 
     enum class BitmapColor
     {
-        G,
-        Ga,
-        Rgb,
-        Rgba,
+        G = 0,
+        Ga = 1,
+        Rgb = 2,
+        Rgba = 3,
         Default = Rgb
     };
 
