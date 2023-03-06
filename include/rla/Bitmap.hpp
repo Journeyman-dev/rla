@@ -22,50 +22,124 @@
 
 #pragma once
 
-#include <rla/bitmap_types.hpp>
+#include <rlm/cellular/cell_box2.hpp>
 #include <cstddef>
 #include <string>
 #include <optional>
 
 namespace rl
 {
-    class BitmapView;
-    class BitmapRowView;
+    class Image;
+    class Png;
+
 
     class Bitmap
     {
         public:
-            static constexpr std::size_t GetChannelCount(rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetChannelSize(rl::BitmapDepth depth) noexcept;
-            static constexpr std::size_t GetBitDepth(rl::BitmapDepth depth) noexcept;
-            static constexpr rl::BitmapDepth GetDepth(std::size_t bit_depth) noexcept;
-            static constexpr std::size_t GetPixelSize(rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetRowSize(std::size_t width, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
-            static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color) noexcept;
-            static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
-            static constexpr void ConvertRow(
-                rl::bitmap_byte_t* source,
-                rl::bitmap_byte_t* destination,
-                std::size_t width,
-                rl::BitmapDepth source_depth,
-                rl::BitmapColor source_color,
-                rl::BitmapDepth destination_depth,
-                rl::BitmapColor destination_color
-            ) noexcept;
+            enum class Depth
+            {
+                Octuple = 0,
+                Sexdecuple = 1,
+                Normalized = 2,
+                Default = Octuple
+            };
+
+            enum class Color
+            {
+                G = 0,
+                Ga = 1,
+                Rgb = 2,
+                Rgba = 3,
+                Default = Rgb
+            };
+
+            using byte_t = unsigned char;
+
+            using octuple_t = unsigned char;
+            using sexdecuple_t = std::uint16_t;
+            using normalized_t = float;
+
+            class Row
+            {
+            protected:
+                rl::Bitmap::byte_t* data;
+                std::size_t width = 0;
+                rl::Bitmap::Depth depth = rl::Bitmap::Depth::Default;
+                rl::Bitmap::Color color = rl::Bitmap::Color::Default;
+
+            public:
+                constexpr Row() noexcept = default;
+                Row(
+                    rl::Bitmap::byte_t* data,
+                    std::size_t width,
+                    rl::Bitmap::Depth depth,
+                    rl::Bitmap::Color color
+                ) noexcept;
+                std::size_t GetWidth() const noexcept;
+                rl::Bitmap::Depth GetDepth() const noexcept;
+                rl::Bitmap::Color GetColor() const noexcept;
+                const rl::Bitmap::byte_t* GetData() const noexcept;
+                const rl::Bitmap::byte_t* GetData(std::size_t x, std::size_t channel = 0) const noexcept;
+                std::size_t GetChannelSize() const noexcept;
+                std::size_t GetBitDepth() const noexcept;
+                std::size_t GetSize() const noexcept;
+                std::optional<std::size_t> GetByteIndex(std::size_t x, std::size_t channel = 0) const noexcept;
+                void Blit(const rl::Bitmap::Row& row);
+                rl::Bitmap::byte_t* GetData() noexcept;
+                rl::Bitmap::byte_t* GetData(std::size_t x, std::size_t channel = 0) noexcept;
+                const rl::Bitmap::byte_t* GetDataConst() const noexcept;
+                const rl::Bitmap::byte_t* GetDataConst(std::size_t x, std::size_t channel = 0) const noexcept;
+            };
 
         public:
-            virtual std::size_t GetWidth() const noexcept = 0;
-            virtual std::size_t GetHeight() const noexcept = 0;
-            virtual std::size_t GetPageCount() const noexcept = 0;
+            static constexpr std::size_t GetChannelCount(rl::Bitmap::Color color) noexcept;
+            static constexpr std::size_t GetChannelSize(rl::Bitmap::Depth depth) noexcept;
+            static constexpr std::size_t GetBitDepth(rl::Bitmap::Depth depth) noexcept;
+            static constexpr rl::Bitmap::Depth GetDepth(std::size_t bit_depth) noexcept;
+            static constexpr std::size_t GetPixelSize(rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept;
+            static constexpr std::size_t GetRowSize(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept;
+            static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept;
+            static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept;
+            static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::Bitmap::Depth depth, rl::Bitmap::Color color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
+    
+        protected:
+            rl::Bitmap::byte_t* data = nullptr;
+            std::size_t width = 0;
+            std::size_t height = 0;
+            std::size_t page_count = 0;
+            rl::Bitmap::Depth depth = rl::Bitmap::Depth::Default;
+            rl::Bitmap::Color color = rl::Bitmap::Color::Default;
+            std::size_t row_offset = 0;
+            std::size_t page_offset = 0;
+
+            bool blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept;
+        public:
+            constexpr Bitmap() noexcept = default;
+            Bitmap(
+                rl::Bitmap::byte_t* data,
+                std::size_t width,
+                std::size_t height,
+                std::size_t page_count,
+                rl::Bitmap::Depth depth,
+                rl::Bitmap::Color color,
+                std::optional<std::size_t> row_offset_o = std::nullopt,
+                std::optional<std::size_t> page_offset_o = std::nullopt
+            ) noexcept;
+            virtual ~Bitmap() noexcept = default;
+
+            std::size_t GetWidth() const noexcept;
+            std::size_t GetHeight() const noexcept;
+            std::size_t GetPageCount() const noexcept;
             std::size_t GetChannelSize() const noexcept;
-            virtual rl::BitmapDepth GetDepth() const noexcept = 0;
-            virtual rl::BitmapColor GetColor() const noexcept = 0;
+            rl::Bitmap::Depth GetDepth() const noexcept;
+            rl::Bitmap::Color GetColor() const noexcept;
             std::size_t GetBitDepth() const noexcept;
-            virtual std::size_t GetRowOffset() const noexcept;
-            virtual std::size_t GetPageOffset() const noexcept;
-            virtual const rl::bitmap_byte_t* GetData() const noexcept = 0;
-            const rl::bitmap_byte_t* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
+            std::size_t GetRowOffset() const noexcept;
+            std::size_t GetPageOffset() const noexcept;
+            rl::Bitmap::byte_t* GetData() noexcept;
+            rl::Bitmap::byte_t* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) noexcept;
+            const rl::Bitmap::byte_t* GetDataConst() const noexcept;
+            const rl::Bitmap::byte_t* GetDataConst(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
             std::size_t GetChannelCount() const noexcept;
             std::size_t GetRowSize() const noexcept;
             std::size_t GetPixelSize() const noexcept;
@@ -73,10 +147,16 @@ namespace rl
             std::size_t GetSize() const noexcept;
             std::optional<std::size_t> GetByteIndex(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;
             bool GetIsEmpty() const noexcept;
-            rl::BitmapView GetView() const noexcept;
-            rl::BitmapView GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count) const noexcept;
-            rl::BitmapRowView GetRowView(std::size_t y, std::size_t page) const noexcept;
-            void SavePng(std::string_view path, std::size_t page = 0);
+            rl::Bitmap GetView(std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt);
+            rl::Bitmap GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt);
+            const rl::Bitmap GetViewConst(std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            const rl::Bitmap GetViewConst(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            rl::Bitmap::Row GetRow(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt);
+            const rl::Bitmap::Row GetRowConst(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            void Save(std::string_view path, std::size_t page = 0);
+            void Blit(const rl::Bitmap& bitmap, std::size_t x, std::size_t y, std::size_t page);
+            void Blit(const rl::Png& png, std::size_t x, std::size_t y, std::size_t page);
+            void Blit(std::string_view path, std::size_t x, std::size_t y, std::size_t page);
     };
 }
 

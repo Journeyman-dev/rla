@@ -21,17 +21,9 @@
 target_sources(${PROJECT_NAME}
     PRIVATE
         "Bitmap.cpp"
-        "BitmapRow.cpp"
-        "BitmapRowView.cpp"
-        "BitmapView.cpp"
         "font_exception.cpp"
         "Font.cpp"
         "Image.cpp"
-        "ImageRow.cpp"
-        "MutableBitmap.cpp"
-        "MutableBitmapRow.cpp"
-        "MutableBitmapRowView.cpp"
-        "MutableBitmapView.cpp"
         "Png.cpp"
         "libpng_ext.cpp"
 )

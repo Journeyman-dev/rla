@@ -59,7 +59,7 @@ void rl::Png::Load(std::string_view path)
 
 bool rl::Png::GetEmpty() const noexcept
 {
-    return this->color == rl::PngColor::None;
+    return this->color == rl::Png::Color::None;
 }
 
 std::string_view rl::Png::GetPath() const noexcept
@@ -87,7 +87,7 @@ void rl::Png::Clear() noexcept
     *this = rl::Png();
 }
 
-rl::PngColor rl::Png::GetColor() const noexcept
+rl::Png::Color rl::Png::GetColor() const noexcept
 {
     return this->color;
 }

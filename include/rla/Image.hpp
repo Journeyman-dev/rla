@@ -22,41 +22,62 @@
 
 #pragma once
 
-#include <rla/bitmap_types.hpp>
-#include <rla/MutableBitmap.hpp>
+#include <rla/Bitmap.hpp>
 #include <cstddef>
 #include <optional>
 #include <string>
 #include <vector>
+#include <rlm/color/concepts.hpp>
 
 namespace rl
 {
-    class Image : public rl::MutableBitmap
+    template<rl::color_channel C>
+    struct color_g;
+    template<rl::color_channel C>
+    struct color_ga;
+    template<rl::color_channel C>
+    struct color_rgb;
+    template<rl::color_channel C>
+    struct color_rgba;
+
+    class Image : public rl::Bitmap
     {
-        private:
-            std::size_t width = 0;
-            std::size_t height = 0;
-            std::size_t page_count = 0;
-            rl::BitmapDepth depth = rl::BitmapDepth::Default;
-            rl::BitmapColor color = rl::BitmapColor::Default;
-            std::vector<rl::bitmap_byte_t> data = std::vector<rl::bitmap_byte_t>();
+        protected:
+            void shrink_data();
+            void reserve_data(std::size_t capacity);
+            void free_data() noexcept;
+
+        protected:
+            std::size_t capacity = 0;
 
         public:
-            using rl::MutableBitmap::MutableBitmap;
+            using rl::Bitmap::Bitmap;
 
-            rl::BitmapColor GetColor() const noexcept override;
-            std::size_t GetWidth() const noexcept override;
-            std::size_t GetHeight() const noexcept override;
-            std::size_t GetPageCount() const noexcept override;
-            rl::BitmapDepth GetDepth() const noexcept override;
-            rl::bitmap_byte_t* GetMutableData() noexcept override;
-            const rl::bitmap_byte_t* GetData() const noexcept override;
+            Image(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
+            template<rl::color_channel C>
+            Image(const rl::color_g<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            template<rl::color_channel C>
+            Image(const rl::color_ga<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            template<rl::color_channel C>
+            Image(const rl::color_rgb<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            template<rl::color_channel C>
+            Image(const rl::color_rgba<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            ~Image() noexcept override;
+
             void Clear() noexcept;
             void ShrinkToFit();
-            void Reserve(std::size_t bytes);
+            void Reserve(std::size_t capacity);
             std::size_t GetCapacity() const noexcept;
-            void Create(std::size_t width, std::size_t height, std::size_t page_count, rl::BitmapDepth depth, rl::BitmapColor color);
-            void LoadPng(const rl::Png& png, std::optional<rl::BitmapDepth> depth_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
-            void LoadPng(std::string_view path, std::optional<rl::BitmapDepth> depth_o = std::nullopt, std::optional<rl::BitmapColor> color_o = std::nullopt);
+            void Create(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
+            template<rl::color_channel C>
+            void Create(const rl::color_g<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            template<rl::color_channel C>
+            void Create(const rl::color_ga<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            template<rl::color_channel C>
+            void Create(const rl::color_rgb<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            template<rl::color_channel C>
+            void Create(const rl::color_rgba<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
+            void Load(const rl::Png& png, std::optional<rl::Bitmap::Depth> depth_o = std::nullopt, std::optional<rl::Bitmap::Color> color_o = std::nullopt);
+            void Load(std::string_view path, std::optional<rl::Bitmap::Depth> depth_o = std::nullopt, std::optional<rl::Bitmap::Color> color_o = std::nullopt);
     };
 }

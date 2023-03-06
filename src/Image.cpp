@@ -23,63 +23,64 @@
 #include <rla/Image.hpp>
 #include <rla/Png.hpp>
 #include <rla/color_conversion.hpp>
+#include <cstring>
 
-rl::bitmap_byte_t* rl::Image::GetMutableData() noexcept
+void rl::Image::shrink_data()
 {
-    return this->data.data();
+    if (this->capacity < this->GetSize())
+    {
+        rl::Bitmap::byte_t* new_data = new rl::Bitmap::byte_t[this->GetSize()];
+        std::memcpy(new_data, this->data, this->GetSize());
+        delete[] this->data;
+        this->data = new_data;
+        this->capacity = this->GetSize();
+    }
 }
 
-rl::BitmapColor rl::Image::GetColor() const noexcept
+void rl::Image::reserve_data(std::size_t capacity)
 {
-    return this->color;
+    if (capacity > this->capacity)
+    {
+        rl::Bitmap::byte_t* new_data = new rl::Bitmap::byte_t[capacity];
+        std::memcpy(new_data, this->data, this->GetSize());
+        delete[] this->data;
+        this->data = new_data;
+        this->capacity = capacity;
+    }
 }
 
-std::size_t rl::Image::GetWidth() const noexcept
+void rl::Image::free_data() noexcept
 {
-    return this->width;
+    delete[] this->data;
+    this->capacity = 0;
+    this->data = nullptr;
 }
 
-std::size_t rl::Image::GetHeight() const noexcept
+rl::Image::~Image() noexcept
 {
-    return this->height;
-}
-
-std::size_t rl::Image::GetPageCount() const noexcept
-{
-    return this->page_count;
-}
-
-rl::BitmapDepth rl::Image::GetDepth() const noexcept
-{
-    return this->depth;
-}
-
-const rl::bitmap_byte_t* rl::Image::GetData() const noexcept
-{
-    return this->data.data();
+    this->free_data();
 }
 
 void rl::Image::Clear() noexcept
 {
-    this->data.clear();
     this->width = 0;
     this->height = 0;
     this->page_count = 0;
-    this->depth = rl::BitmapDepth::Octuple;
-    this->color = rl::BitmapColor::Rgb;
+    this->depth = rl::Bitmap::Depth::Default;
+    this->color = rl::Bitmap::Color::Default;
 }
 
 void rl::Image::ShrinkToFit()
 {
-    this->data.shrink_to_fit();
+    this->shrink_data();
 }
 
-void rl::Image::Reserve(std::size_t bytes)
+void rl::Image::Reserve(std::size_t capacity)
 {
-    this->data.reserve(bytes);
+    this->reserve_data(capacity);
 }
 
-void rl::Image::Create(std::size_t width, std::size_t height, std::size_t page_count, rl::BitmapDepth depth, rl::BitmapColor color)
+void rl::Image::Create(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color)
 {
     this->Clear();
     const auto size = 
@@ -90,7 +91,7 @@ void rl::Image::Create(std::size_t width, std::size_t height, std::size_t page_c
             depth,
             color
         );
-    this->data.resize(size, 0);
+    this->reserve_data(size);
     this->width = width;
     this->height = height;
     this->page_count = page_count;
@@ -98,22 +99,24 @@ void rl::Image::Create(std::size_t width, std::size_t height, std::size_t page_c
     this->depth = depth;
 }
 
-void rl::Image::LoadPng(const rl::Png& png, std::optional<rl::BitmapDepth> depth_o, std::optional<rl::BitmapColor> color_o)
+void rl::Image::Load(const rl::Png& png, std::optional<rl::Bitmap::Depth> depth_o, std::optional<rl::Bitmap::Color> color_o)
 {
-    const auto color = 
-        color_o.value_or(
-            rl::to_bitmap_color(png.GetColor())
-        );
-    const auto depth =
+    this->Create(
+        png.GetWidth(),
+        png.GetHeight(),
+        1,
         depth_o.value_or(
             rl::Bitmap::GetDepth(png.GetBitDepth())
-        );
-    this->Create(png.GetWidth(), png.GetHeight(), 1, depth, color);
-    this->BlitPng(png, 0, 0, 0);
+        ),
+        color_o.value_or(
+            rl::to_bitmap_color(png.GetColor())
+        )
+    );
+    this->Blit(png, 0, 0, 0);
 }
 
-void rl::Image::LoadPng(std::string_view path, std::optional<rl::BitmapDepth> depth_o, std::optional<rl::BitmapColor> color_o)
+void rl::Image::Load(std::string_view path, std::optional<rl::Bitmap::Depth> depth_o, std::optional<rl::Bitmap::Color> color_o)
 {
     const auto png = rl::Png(path);
-    this->LoadPng(png, depth_o, color_o);
+    this->Load(png, depth_o, color_o);
 }

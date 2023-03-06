@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <rla/PngColor.hpp>
-#include <rla/bitmap_types.hpp>
+#include <rla/Png.hpp>
+#include <rla/Bitmap.hpp>
 #include <png.h>
 #include <fstream>
 #include <string>
@@ -32,13 +32,13 @@
 
 namespace rl
 {
-    rl::PngColor libpng_color_to_png_color(int png_color) noexcept;
-    int bitmap_color_to_libpng_color(rl::BitmapColor bitmap_color) noexcept;
+    rl::Png::Color libpng_color_to_png_color(int png_color) noexcept;
+    int bitmap_color_to_libpng_color(rl::Bitmap::Color bitmap_color) noexcept;
     void libpng_read_close(png_structp& png_ptr, png_infop& info_ptr, std::ifstream& file);
     void libpng_read_open(std::string_view path, png_structp& png_ptr, png_infop& info_ptr, std::ifstream& file);
     void libpng_set_read_fn(png_structp& png_ptr, std::ifstream& file);
     void libpng_read_file_info(png_structp& png_ptr, png_infop& info_ptr, png_uint_32& png_width, png_uint_32& png_height, int& png_bit_depth, int& png_color_type);
-    void libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int png_bit_depth, int png_color_type, rl::BitmapDepth depth, rl::BitmapColor color);
+    void libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int png_bit_depth, int png_color_type, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
     void libpng_write_open(std::string_view path, png_structp& png_ptr, png_infop& info_ptr, std::ofstream& file);
     void libpng_write_close(png_structp& png_ptr, png_infop& info_ptr, std::ofstream& file);
     void libpng_set_write_fn(png_structp& png_ptr, std::ofstream& file);

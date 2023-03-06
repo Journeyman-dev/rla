@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include <rla/PngColor.hpp>
-#include <rla/bitmap_types.hpp>
+#include <rla/Png.hpp>
+#include <rla/Bitmap.hpp>
 
 namespace rl
 {
-    constexpr rl::PngColor to_png_color(rl::BitmapColor color) noexcept;
+    constexpr rl::Png::Color to_png_color(rl::Bitmap::Color color) noexcept;
 
-    constexpr rl::BitmapColor to_bitmap_color(rl::PngColor color) noexcept;
+    constexpr rl::Bitmap::Color to_bitmap_color(rl::Png::Color color) noexcept;
 }
 
 #include <rla/detail/color_conversion.inl>

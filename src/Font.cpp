@@ -23,7 +23,7 @@
 #include <rla/Font.hpp>
 #include <freetype/freetype.h>
 #include <stdexcept>
-#include <rla/BitmapView.hpp>
+#include <rla/Bitmap.hpp>
 #include <rla/font_exception.hpp>
 
 rl::Font::~Font() noexcept
@@ -103,20 +103,20 @@ void rl::Font::LoadChar(char character)
     }
 }
 
-rl::BitmapView rl::Font::GetBitmapView() const
+rl::Bitmap rl::Font::GetCharBitmap() const
 {
     if (!this->IsLoaded())
     {
         throw rl::font_exception(rl::font_exception::Error::GlyphLoadFailure);
     }
     return 
-        rl::BitmapView(
+        rl::Bitmap(
             this->freetype_face->glyph->bitmap.buffer,
             this->freetype_face->glyph->bitmap.width,
             this->freetype_face->glyph->bitmap.rows,
             1,
-            rl::BitmapDepth::Octuple,
-            rl::BitmapColor::G,
+            rl::Bitmap::Depth::Octuple,
+            rl::Bitmap::Color::G,
             std::nullopt,
             std::nullopt
         );

@@ -47,6 +47,6 @@ namespace rl
             bool IsLoaded() const noexcept;
             void SetPixelSizes(int width, int height);
             void LoadChar(char character);
-            rl::BitmapView GetBitmapView() const;
+            rl::Bitmap GetCharBitmap() const;
     };
 }

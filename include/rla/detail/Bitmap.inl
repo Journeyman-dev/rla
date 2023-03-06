@@ -23,7 +23,6 @@
 #pragma once
 
 #include <rlm/concepts.hpp>
-#include <rla/bitmap_types.hpp>
 #include <rlm/color/color_g.hpp>
 #include <rlm/color/color_ga.hpp>
 #include <rlm/color/color_rgb.hpp>
@@ -33,61 +32,61 @@
 #include <optional>
 #include <cstring>
 
-constexpr std::size_t rl::Bitmap::GetChannelCount(rl::BitmapColor color) noexcept
+constexpr std::size_t rl::Bitmap::GetChannelCount(rl::Bitmap::Color color) noexcept
 {
     switch (color)
     {
-        case rl::BitmapColor::G:
+        case rl::Bitmap::Color::G:
             return 1;
-        case rl::BitmapColor::Ga:
+        case rl::Bitmap::Color::Ga:
             return 2;
-        case rl::BitmapColor::Rgb:
+        case rl::Bitmap::Color::Rgb:
             return 3;
-        case rl::BitmapColor::Rgba:
+        case rl::Bitmap::Color::Rgba:
 			return 4;
     }
 	return 3;
 }
 
-constexpr std::size_t rl::Bitmap::GetChannelSize(rl::BitmapDepth depth) noexcept
+constexpr std::size_t rl::Bitmap::GetChannelSize(rl::Bitmap::Depth depth) noexcept
 {
     switch (depth)
 	{
-		case rl::BitmapDepth::Octuple:
+		case rl::Bitmap::Depth::Octuple:
 			return 1;
-		case rl::BitmapDepth::Sexdecuple:
+		case rl::Bitmap::Depth::Sexdecuple:
 			return 2;
-		case rl::BitmapDepth::Normalized:
+		case rl::Bitmap::Depth::Normalized:
 			return 4;
 	}
 	return 1;
 }
 
-constexpr std::size_t rl::Bitmap::GetBitDepth(rl::BitmapDepth depth) noexcept
+constexpr std::size_t rl::Bitmap::GetBitDepth(rl::Bitmap::Depth depth) noexcept
 {
     return rl::Bitmap::GetChannelSize(depth) * 8;
 }
 
-constexpr rl::BitmapDepth rl::Bitmap::GetDepth(std::size_t bit_depth) noexcept
+constexpr rl::Bitmap::Depth rl::Bitmap::GetDepth(std::size_t bit_depth) noexcept
 {
 	switch (bit_depth)
 	{
 		case 8:
-			return rl::BitmapDepth::Octuple;
+			return rl::Bitmap::Depth::Octuple;
 		case 16:
-			return rl::BitmapDepth::Sexdecuple;
+			return rl::Bitmap::Depth::Sexdecuple;
 	}
-	return rl::BitmapDepth::Octuple;
+	return rl::Bitmap::Depth::Octuple;
 }
 
-constexpr std::size_t rl::Bitmap::GetPixelSize(rl::BitmapDepth depth, rl::BitmapColor color) noexcept
+constexpr std::size_t rl::Bitmap::GetPixelSize(rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept
 {
     return
         rl::Bitmap::GetChannelSize(depth) *
         rl::Bitmap::GetChannelCount(color);
 }
 
-constexpr std::size_t rl::Bitmap::GetRowSize(std::size_t width, rl::BitmapDepth depth, rl::BitmapColor color) noexcept
+constexpr std::size_t rl::Bitmap::GetRowSize(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept
 {
     return
         width *
@@ -95,7 +94,7 @@ constexpr std::size_t rl::Bitmap::GetRowSize(std::size_t width, rl::BitmapDepth 
         rl::Bitmap::GetChannelCount(color);
 }
 
-constexpr std::size_t rl::Bitmap::GetPageSize(std::size_t width, std::size_t height, rl::BitmapDepth depth, rl::BitmapColor color) noexcept
+constexpr std::size_t rl::Bitmap::GetPageSize(std::size_t width, std::size_t height, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept
 {
     return
         width *
@@ -104,7 +103,7 @@ constexpr std::size_t rl::Bitmap::GetPageSize(std::size_t width, std::size_t hei
         rl::Bitmap::GetChannelCount(color);
 }
 
-constexpr std::size_t rl::Bitmap::GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color) noexcept
+constexpr std::size_t rl::Bitmap::GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept
 {
     return
         width *
@@ -114,7 +113,7 @@ constexpr std::size_t rl::Bitmap::GetSize(std::size_t width, std::size_t height,
         rl::Bitmap::GetChannelCount(color);
 }
 
-constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::BitmapDepth depth, rl::BitmapColor color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept
+constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::Bitmap::Depth depth, rl::Bitmap::Color color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept
 {
     if (
         channel >= rl::Bitmap::GetChannelCount(color) ||

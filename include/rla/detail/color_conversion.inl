@@ -22,39 +22,39 @@
 
 #pragma once
 
-#include <rla/bitmap_types.hpp>
-#include <rla/PngColor.hpp>
+#include <rla/Bitmap.hpp>
+#include <rla/Png.hpp>
 
-constexpr rl::PngColor rl::to_png_color(rl::BitmapColor color) noexcept
+constexpr rl::Png::Color rl::to_png_color(rl::Bitmap::Color color) noexcept
 {
     switch (color)
     {
-        case rl::BitmapColor::G:
-            return rl::PngColor::G;
-        case rl::BitmapColor::Ga:
-            return rl::PngColor::Ga;
-        case rl::BitmapColor::Rgb:
-            return rl::PngColor::Rgb;
-        case rl::BitmapColor::Rgba:
-            return rl::PngColor::Rgba;
+        case rl::Bitmap::Color::G:
+            return rl::Png::Color::G;
+        case rl::Bitmap::Color::Ga:
+            return rl::Png::Color::Ga;
+        case rl::Bitmap::Color::Rgb:
+            return rl::Png::Color::Rgb;
+        case rl::Bitmap::Color::Rgba:
+            return rl::Png::Color::Rgba;
     }
-    return rl::PngColor::Rgb;
+    return rl::Png::Color::Rgb;
 }
 
-constexpr rl::BitmapColor rl::to_bitmap_color(rl::PngColor color) noexcept
+constexpr rl::Bitmap::Color rl::to_bitmap_color(rl::Png::Color color) noexcept
 {
     switch (color)
     {
-        case rl::PngColor::G:
-            return rl::BitmapColor::G;
-        case rl::PngColor::Ga:
-            return rl::BitmapColor::Ga;
-        case rl::PngColor::Rgb:
-            return rl::BitmapColor::Rgb;
-        case rl::PngColor::Rgba:
-            return rl::BitmapColor::Rgba;
-        case rl::PngColor::Palette:
-            return rl::BitmapColor::Rgb;
+        case rl::Png::Color::G:
+            return rl::Bitmap::Color::G;
+        case rl::Png::Color::Ga:
+            return rl::Bitmap::Color::Ga;
+        case rl::Png::Color::Rgb:
+            return rl::Bitmap::Color::Rgb;
+        case rl::Png::Color::Rgba:
+            return rl::Bitmap::Color::Rgba;
+        case rl::Png::Color::Palette:
+            return rl::Bitmap::Color::Rgb;
     }
-    return rl::BitmapColor::Rgb;
+    return rl::Bitmap::Color::Rgb;
 }

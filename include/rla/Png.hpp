@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <rla/PngColor.hpp>
 #include <string>
 #include <cstddef>
 
@@ -30,11 +29,22 @@ namespace rl
 {
     class Png
     {
+        public:
+            enum class Color
+            {
+                None,
+                G,
+                Ga,
+                Rgb,
+                Rgba,
+                Palette
+            };
+
         private:
             std::string path = "";
             std::size_t width = 0;
             std::size_t height = 0;
-            rl::PngColor color = rl::PngColor::None;
+            rl::Png::Color color = rl::Png::Color::None;
             std::size_t bit_depth = 0;
 
         public:
@@ -47,7 +57,7 @@ namespace rl
             std::size_t GetWidth() const noexcept;
             std::size_t GetHeight() const noexcept;
             std::size_t GetBitDepth() const noexcept;
-            rl::PngColor GetColor() const noexcept;
+            rl::Png::Color GetColor() const noexcept;
             void Clear() noexcept;
     };
 }

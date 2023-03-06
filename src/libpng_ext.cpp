@@ -28,35 +28,35 @@
 #include <array>
 #include <string>
 
-rl::PngColor rl::libpng_color_to_png_color(int png_color) noexcept
+rl::Png::Color rl::libpng_color_to_png_color(int png_color) noexcept
 {
     switch (png_color)
     {
     case PNG_COLOR_TYPE_PALETTE:
-      return rl::PngColor::Palette;
+      return rl::Png::Color::Palette;
     case PNG_COLOR_TYPE_GRAY:
-      return rl::PngColor::G;
+      return rl::Png::Color::G;
     case PNG_COLOR_TYPE_GRAY_ALPHA:
-      return rl::PngColor::Ga;
+      return rl::Png::Color::Ga;
     case PNG_COLOR_TYPE_RGB:
-      return rl::PngColor::Rgb;
+      return rl::Png::Color::Rgb;
     case PNG_COLOR_TYPE_RGBA:
-      return rl::PngColor::Rgba;
+      return rl::Png::Color::Rgba;
     }
-    return rl::PngColor::None;
+    return rl::Png::Color::None;
 }
 
-int rl::bitmap_color_to_libpng_color(rl::BitmapColor color) noexcept
+int rl::bitmap_color_to_libpng_color(rl::Bitmap::Color color) noexcept
 {
     switch (color)
     {
-    case rl::BitmapColor::G:
+    case rl::Bitmap::Color::G:
       return PNG_COLOR_TYPE_GRAY;
-    case rl::BitmapColor::Ga:
+    case rl::Bitmap::Color::Ga:
       return PNG_COLOR_TYPE_GRAY_ALPHA;
-    case rl::BitmapColor::Rgb:
+    case rl::Bitmap::Color::Rgb:
       return PNG_COLOR_TYPE_RGB;
-    case rl::BitmapColor::Rgba:
+    case rl::Bitmap::Color::Rgba:
       return PNG_COLOR_TYPE_RGBA;
     }
     return PNG_COLOR_TYPE_RGB;
@@ -133,17 +133,17 @@ void rl::libpng_read_file_info(png_structp& png_ptr, png_infop& info_ptr, png_ui
   );
 }
 
-void rl::libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int png_bit_depth, int png_color_type, rl::BitmapDepth depth, rl::BitmapColor color)
+void rl::libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int png_bit_depth, int png_color_type, rl::Bitmap::Depth depth, rl::Bitmap::Color color)
 {
   // the following is taken from png_wrapper.h (https://github.com/Journeyman-dev/png_wrapper.h/)
   // if alpha channel not wanted, strip it if the image has one.
-  if ((png_color_type & PNG_COLOR_MASK_ALPHA) && color != rl::BitmapColor::Ga && color != rl::BitmapColor::Rgba)
+  if ((png_color_type & PNG_COLOR_MASK_ALPHA) && color != rl::Bitmap::Color::Ga && color != rl::Bitmap::Color::Rgba)
   {
     png_set_strip_alpha(png_ptr);
   }
   // if expecting an alpha channel and none exists in the image, add a fully opaque alpha value to
   // each pixel
-  if ((color == rl::BitmapColor::Ga || color == rl::BitmapColor::Rgba) &&
+  if ((color == rl::Bitmap::Color::Ga || color == rl::Bitmap::Color::Rgba) &&
       (png_color_type == PNG_COLOR_TYPE_GRAY || png_color_type == PNG_COLOR_TYPE_RGB ||
         png_color_type == PNG_COLOR_TYPE_PALETTE))
   {
@@ -151,12 +151,12 @@ void rl::libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int pn
   }
   // if multiple pixels are packed per byte on 8 bit depth, seperate them into seperate bytes
   // cleanly
-  if (png_bit_depth < 8 && depth == rl::BitmapDepth::Octuple)
+  if (png_bit_depth < 8 && depth == rl::Bitmap::Depth::Octuple)
   {
     png_set_packing(png_ptr);
   }
   // if the image has bit depth 16 and 8 is wanted, auto convert it to bit depth 8
-  if (png_bit_depth == 16 && depth == rl::BitmapDepth::Octuple)
+  if (png_bit_depth == 16 && depth == rl::Bitmap::Depth::Octuple)
   {
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
     png_set_scale_16(png_ptr);
@@ -165,7 +165,7 @@ void rl::libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int pn
 #endif
   }
   // if image has less than 16 bit depth and 16 is wanted, upscale it to 16
-  if (png_bit_depth < 16 && depth == rl::BitmapDepth::Sexdecuple)
+  if (png_bit_depth < 16 && depth == rl::Bitmap::Depth::Sexdecuple)
   {
     png_set_expand_16(png_ptr);
   }
@@ -188,8 +188,8 @@ void rl::libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int pn
   // set rgb image to gray output or vice versa
   if (
     (
-      color == rl::BitmapColor::G ||
-      color == rl::BitmapColor::Ga
+      color == rl::Bitmap::Color::G ||
+      color == rl::Bitmap::Color::Ga
     ) &&
     (
       png_color_type == PNG_COLOR_TYPE_RGB ||
@@ -204,7 +204,7 @@ void rl::libpng_read_configure(png_structp& png_ptr, png_infop& info_ptr, int pn
         png_ptr, 1, -1.0,
         -1.0);  // error action 1 causes no waring warning if image was not actually gray
   }
-  if ((color == rl::BitmapColor::Rgb || color == rl::BitmapColor::Rgba) &&
+  if ((color == rl::Bitmap::Color::Rgb || color == rl::Bitmap::Color::Rgba) &&
     (png_color_type == PNG_COLOR_TYPE_GRAY || png_color_type == PNG_COLOR_TYPE_GRAY_ALPHA))
   {
     png_set_gray_to_rgb(png_ptr);
