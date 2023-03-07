@@ -77,7 +77,7 @@ rl::Bitmap::View::View(const rl::Bitmap& bitmap) noexcept
 
 rl::Bitmap::View& rl::Bitmap::View::operator=(const rl::Bitmap& bitmap) noexcept
 {
-    this->data = const_cast<rl::Bitmap&>(bitmap).GetData();
+    this->data = bitmap.GetData();
     this->width = bitmap.GetWidth();
     this->height = bitmap.GetHeight();
     this->page_count = bitmap.GetPageCount();
