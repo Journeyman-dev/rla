@@ -218,7 +218,8 @@ namespace rl
             std::size_t GetRowOffset() const noexcept;
             std::size_t GetPageOffset() const noexcept;
             rl::Bitmap::byte_t* GetData() const noexcept;
-            rl::Bitmap::byte_t* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;            std::size_t GetChannelCount() const noexcept;
+            rl::Bitmap::byte_t* GetData(std::size_t x, std::size_t y = 0, std::size_t page = 0, std::size_t channel = 0) const noexcept;            
+            std::size_t GetChannelCount() const noexcept;
             std::size_t GetRowSize() const noexcept;
             std::size_t GetPixelSize() const noexcept;
             std::size_t GetPageSize() const noexcept;
