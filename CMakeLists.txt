@@ -27,6 +27,7 @@ project(rla
     LANGUAGES CXX
 )
 set(RLA_CXX_STANDARD 20)
+option(RLA_BUILD_TESTS "Enable the automatic test framework for RLA." ON)
 add_library(${PROJECT_NAME} STATIC "")
 add_subdirectory(src)
 add_library(rla::rla ALIAS ${PROJECT_NAME})
@@ -45,6 +46,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/Journeyman-dev/rlm
     GIT_TAG        v0.3.0.1
 )
+set(RLM_BUILD_TESTS OFF)
 FetchContent_Declare(
     rld
     GIT_REPOSITORY https://github.com/Journeyman-dev/rld
@@ -58,7 +60,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(png rlm rld freetype)
 target_link_libraries(
     ${PROJECT_NAME}
-        PRIVATE
+        PUBLIC
             png
             rlm::rlm
             rld::rld
@@ -75,3 +77,6 @@ set_target_properties(${PROJECT_NAME}
     CXX_STANDARD ${RLA_CXX_STANDARD}
     CXX_STANDARD_REQUIRED TRUE
 )
+if(RLA_BUILD_TESTS)
+    add_subdirectory(test)
+endif()
