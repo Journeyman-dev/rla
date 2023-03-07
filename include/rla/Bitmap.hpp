@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <rlm/cellular/cell_box2.hpp>
 #include <cstddef>
 #include <string>
 #include <optional>
@@ -195,10 +194,8 @@ namespace rl
             std::size_t row_offset = 0;
             std::size_t page_offset = 0;
 
-            bool blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept;
         public:
             constexpr Bitmap() noexcept = default;
-            Bitmap(
                 rl::Bitmap::byte_t* data,
                 std::size_t width,
                 std::size_t height,
@@ -236,6 +233,14 @@ namespace rl
             const rl::Bitmap::Row::View GetRowView(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
             void Save(std::string_view path, std::size_t page = 0);
             void Blit(const rl::Bitmap::View& bitmap, std::size_t x, std::size_t y, std::size_t page);
+            constexpr rl::Bitmap GetBitmap(std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt);
+            constexpr rl::Bitmap GetBitmap(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt);
+            constexpr rl::Bitmap::View GetBitmapView(std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            constexpr rl::Bitmap::View GetBitmapView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            constexpr rl::Bitmap::Row GetRow(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            constexpr const rl::Bitmap::Row::View GetRowView(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o = std::nullopt, std::optional<rl::Bitmap::Color> fake_color_o = std::nullopt) const;
+            constexpr void Save(std::string_view path, std::size_t page = 0);
+            constexpr void Blit(const rl::Bitmap::View& bitmap, std::size_t x, std::size_t y, std::size_t page);
             void Blit(const rl::Png& png, std::size_t x, std::size_t y, std::size_t page);
             void Blit(std::string_view path, std::size_t x, std::size_t y, std::size_t page);
     };

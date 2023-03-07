@@ -22,25 +22,10 @@
 
 #include <rla/Bitmap.hpp>
 #include <rld/except.hpp>
-#include <rlm/cellular/cell_box2.hpp>
-#include <rlm/cellular/does_contain.hpp>
 #include "libpng_ext.hpp"
 #include <png.h>
 #include <cstddef>
 #include <fstream>
-
-bool rl::Bitmap::blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept
-{
-    rl::cell_box2<int> this_box(
-        0,
-        0,
-        static_cast<int>(this->GetWidth()),
-        static_cast<int>(this->GetHeight())
-    );
-    return 
-        page < this->GetPageCount() &&
-        rl::does_contain(this_box, blit_box);
-}
 
 rl::Bitmap::Bitmap(
     rl::Bitmap::byte_t* data,
