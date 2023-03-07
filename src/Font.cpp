@@ -103,15 +103,15 @@ void rl::Font::LoadChar(char character)
     }
 }
 
-rl::Bitmap rl::Font::GetCharBitmap() const
+rl::Bitmap::View rl::Font::GetCharBitmap() const
 {
     if (!this->IsLoaded())
     {
         throw rl::font_exception(rl::font_exception::Error::GlyphLoadFailure);
     }
     return 
-        rl::Bitmap(
-            this->freetype_face->glyph->bitmap.buffer,
+        rl::Bitmap::View(
+            reinterpret_cast<const rl::Bitmap::byte_t*>(freetype_face->glyph->bitmap.buffer),
             this->freetype_face->glyph->bitmap.width,
             this->freetype_face->glyph->bitmap.rows,
             1,

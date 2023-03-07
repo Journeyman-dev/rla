@@ -29,259 +29,6 @@
 #include <cstddef>
 #include <fstream>
 
-rl::Bitmap::Row::Row(
-    rl::Bitmap::byte_t* data,
-    std::size_t width,
-    rl::Bitmap::Depth depth,
-    rl::Bitmap::Color color
-) noexcept
-    : data(data)
-    , width(width)
-    , depth(depth)
-    , color(color)
-{
-}
-
-std::size_t rl::Bitmap::Row::GetWidth() const noexcept
-{
-    return this->width;
-}
-
-rl::Bitmap::Depth rl::Bitmap::Row::GetDepth() const noexcept
-{
-    return this->depth;
-}
-
-rl::Bitmap::Color rl::Bitmap::Row::GetColor() const noexcept
-{
-    return this->color;
-}
-
-const rl::Bitmap::byte_t* rl::Bitmap::Row::GetData() const noexcept
-{
-    return this->data;
-}
-
-const rl::Bitmap::byte_t* rl::Bitmap::Row::GetData(std::size_t x, std::size_t channel) const noexcept
-{
-    return this->data;
-}
-
-std::size_t rl::Bitmap::Row::GetChannelSize() const noexcept
-{
-    return rl::Bitmap::GetChannelSize(this->depth);
-}
-
-std::size_t rl::Bitmap::Row::GetBitDepth() const noexcept
-{
-    return rl::Bitmap::GetBitDepth(this->depth);
-}
-
-std::size_t rl::Bitmap::Row::GetSize() const noexcept
-{
-    return rl::Bitmap::GetRowSize(this->width, this->depth, this->color);
-}
-
-std::optional<std::size_t> rl::Bitmap::Row::GetByteIndex(std::size_t x, std::size_t channel) const noexcept
-{
-    return
-        rl::Bitmap::GetByteIndex(
-            this->width,
-            0,
-            0,
-            this->depth,
-            this->color,
-            0,
-            0,
-            x,
-            0,
-            0,
-            channel
-        );
-}
-
-void rl::Bitmap::Row::Blit(const rl::Bitmap::Row& row)
-{
-    if (row.width != this->width)
-    {
-        throw rl::runtime_error("blit row has different width");
-    }
-    auto convert_row = [&]<typename S, typename D>() 
-	{
-		auto source_to_destination = [&]<typename SP>(std::size_t x, const SP& source_pixel) 
-        {
-            std::size_t channel_i = 0;
-            D* destination_ptr = reinterpret_cast<D*>(this->GetData(x, 0));
-			if (this->color == rl::Bitmap::Color::G)
-			{
-				const auto destination_pixel = rl::to_color_g<D, S>(source_pixel);
-				destination_ptr[channel_i++] = destination_pixel.g;
-			}
-			else if (this->color == rl::Bitmap::Color::Ga)
-			{
-				const auto destination_pixel = rl::to_color_ga<D, S>(source_pixel);
-				destination_ptr[channel_i++] = destination_pixel.g;
-				destination_ptr[channel_i] = destination_pixel.a;
-			}
-			else if (this->color == rl::Bitmap::Color::Rgb)
-			{
-				const auto destination_pixel = rl::to_color_rgb<D, S>(source_pixel);
-				destination_ptr[channel_i++] = destination_pixel.r;
-				destination_ptr[channel_i++] = destination_pixel.g;
-				destination_ptr[channel_i] = destination_pixel.b;
-			}
-			else if (this->color == rl::Bitmap::Color::Rgba)
-			{
-				const auto destination_pixel = rl::to_color_rgba<D, S>(source_pixel);
-				destination_ptr[channel_i++] = destination_pixel.r;
-				destination_ptr[channel_i++] = destination_pixel.g;
-				destination_ptr[channel_i++] = destination_pixel.b;
-				destination_ptr[channel_i] = destination_pixel.a;
-			}
-		};
-		auto convert_pixel = [&](std::size_t x) 
-		{
-			const S* source_ptr = reinterpret_cast<const S*>(row.GetDataConst(x, 0));
-            std::size_t channel_i = 0;
-			if (row.GetColor() == rl::Bitmap::Color::G)
-			{
-				source_to_destination(
-					x,
-					rl::color_g<S>(
-						source_ptr[channel_i]
-					)
-				);
-			}
-			else if (row.GetColor() == rl::Bitmap::Color::Ga)
-			{
-				source_to_destination(
-					x,
-					rl::color_ga<S>(
-						source_ptr[channel_i++],
-						source_ptr[channel_i]
-					)
-				);
-			}
-			else if (row.GetColor() == rl::Bitmap::Color::Rgb)
-			{
-				source_to_destination(
-					x,
-					rl::color_rgb<S>(
-						source_ptr[channel_i++],
-						source_ptr[channel_i++],
-						source_ptr[channel_i]
-					)
-				);				
-			}
-			else if (row.GetColor() == rl::Bitmap::Color::Rgba)
-			{
-				source_to_destination(
-					x,
-					rl::color_rgba<S>(
-						source_ptr[channel_i++],
-						source_ptr[channel_i++],
-						source_ptr[channel_i++],
-						source_ptr[channel_i]
-					)
-				);
-			}
-		};
-		// convert in reverse if necessary to prevent pixel overwriting when the pixels are converted in place. 
-		if (sizeof(S) >= sizeof(D))
-		{
-			for (int pixel_i = 0; pixel_i < this->GetWidth(); pixel_i++)
-			{
-				convert_pixel(static_cast<std::size_t>(pixel_i));
-			}
-		}
-		else
-		{
-			for (int pixel_i = this->GetWidth(); pixel_i >= 0; pixel_i--)
-			{
-				convert_pixel(static_cast<std::size_t>(pixel_i));
-			}
-		}
-	};
-	switch (row.GetDepth())
-	{
-		case rl::Bitmap::Depth::Octuple:
-			switch (this->depth)
-			{
-				case rl::Bitmap::Depth::Octuple:
-					convert_row.template operator()<std::uint8_t, std::uint8_t>();
-					break;
-				case rl::Bitmap::Depth::Sexdecuple:
-					convert_row.template operator()<std::uint8_t, std::uint16_t>();
-					break;
-				case rl::Bitmap::Depth::Normalized:
-					convert_row.template operator()<std::uint8_t, float>();
-					break;
-			}
-			break;
-		case rl::Bitmap::Depth::Sexdecuple:
-			switch (this->depth)
-			{
-				case rl::Bitmap::Depth::Octuple:
-					convert_row.template operator()<std::uint16_t, std::uint8_t>();
-					break;
-				case rl::Bitmap::Depth::Sexdecuple:
-					convert_row.template operator()<std::uint16_t, std::uint16_t>();
-					break;
-				case rl::Bitmap::Depth::Normalized:
-					convert_row.template operator()<std::uint16_t, float>();
-					break;
-			}
-			break;
-		case rl::Bitmap::Depth::Normalized:
-			switch (this->depth)
-			{
-				case rl::Bitmap::Depth::Octuple:
-					convert_row.template operator()<float, std::uint8_t>();
-					break;
-				case rl::Bitmap::Depth::Sexdecuple:
-					convert_row.template operator()<float, std::uint16_t>();
-					break;
-				case rl::Bitmap::Depth::Normalized:
-					convert_row.template operator()<float, float>();
-					break;
-			}
-	}
-}
-
-rl::Bitmap::byte_t* rl::Bitmap::Row::GetData() noexcept
-{
-    return this->data;
-}
-
-rl::Bitmap::byte_t* rl::Bitmap::Row::GetData(std::size_t x, std::size_t channel) noexcept
-{
-    const auto byte_index_o = this->GetByteIndex(x, channel);
-    if (!byte_index_o.has_value())
-    {
-        return nullptr;
-    }
-    return
-        this->data +
-        byte_index_o.value();
-}
-
-const rl::Bitmap::byte_t* rl::Bitmap::Row::GetDataConst() const noexcept
-{
-    return this->data;
-}
-
-const rl::Bitmap::byte_t* rl::Bitmap::Row::GetDataConst(std::size_t x, std::size_t channel) const noexcept
-{
-    const auto byte_index_o = this->GetByteIndex(x, channel);
-    if (!byte_index_o.has_value())
-    {
-        return nullptr;
-    }
-    return
-        this->data +
-        byte_index_o.value();
-}
-
 bool rl::Bitmap::blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept
 {
     rl::cell_box2<int> this_box(
@@ -356,29 +103,12 @@ std::size_t rl::Bitmap::GetBitDepth() const noexcept
         );
 }
 
-rl::Bitmap::byte_t* rl::Bitmap::GetData() noexcept
+rl::Bitmap::byte_t* rl::Bitmap::GetData() const noexcept
 {
     return this->data;
 }
 
-rl::Bitmap::byte_t* rl::Bitmap::GetData(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept
-{
-    const auto byte_index_o = this->GetByteIndex(x, y, page, channel);
-    if (!byte_index_o.has_value())
-    {
-        return nullptr;
-    }
-    return
-        this->data +
-        byte_index_o.value();
-}
-
-const rl::Bitmap::byte_t* rl::Bitmap::GetDataConst() const noexcept
-{
-    return this->data;
-}
-
-const rl::Bitmap::byte_t* rl::Bitmap::GetDataConst(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
+rl::Bitmap::byte_t* rl::Bitmap::GetData(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
 {
     const auto byte_index_o = this->GetByteIndex(x, y, page, channel);
     if (!byte_index_o.has_value())
@@ -468,10 +198,10 @@ std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t x, std::size_t y
         );
 }
 
-rl::Bitmap rl::Bitmap::GetView(std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
+rl::Bitmap rl::Bitmap::GetBitmap(std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
 {
     return
-        this->GetView(
+        this->GetBitmap(
             0,
             0,
             0,
@@ -483,7 +213,7 @@ rl::Bitmap rl::Bitmap::GetView(std::optional<rl::Bitmap::Depth> fake_depth_o, st
         );
 }
 
-rl::Bitmap rl::Bitmap::GetView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
+rl::Bitmap rl::Bitmap::GetBitmap(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
 {
     if (
         x >= this->width ||
@@ -513,10 +243,10 @@ rl::Bitmap rl::Bitmap::GetView(std::size_t x, std::size_t y, std::size_t page, s
         );
 }
 
-const rl::Bitmap rl::Bitmap::GetViewConst(std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+rl::Bitmap::View rl::Bitmap::GetBitmapView(std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
 {
     return
-        this->GetViewConst(
+        this->GetBitmapView(
             0,
             0,
             0,
@@ -528,7 +258,7 @@ const rl::Bitmap rl::Bitmap::GetViewConst(std::optional<rl::Bitmap::Depth> fake_
         );
 }
 
-const rl::Bitmap rl::Bitmap::GetViewConst(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+rl::Bitmap::View rl::Bitmap::GetBitmapView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
 {
     if (
         x >= this->width ||
@@ -546,8 +276,8 @@ const rl::Bitmap rl::Bitmap::GetViewConst(std::size_t x, std::size_t y, std::siz
         throw rl::runtime_error("fake bitmap size larger than real bitmap size");
     }
     return
-        rl::Bitmap(
-            const_cast<rl::Bitmap::byte_t*>(this->GetDataConst(x, y, page, 0)),
+        rl::Bitmap::View(
+            this->GetData(x, y, page, 0),
             width,
             height,
             page_count,
@@ -558,7 +288,7 @@ const rl::Bitmap rl::Bitmap::GetViewConst(std::size_t x, std::size_t y, std::siz
         );
 }
 
-rl::Bitmap::Row rl::Bitmap::GetRow(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
+rl::Bitmap::Row rl::Bitmap::GetRow(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
 {
     if (y >= this->height || page >= this->page_count)
     {
@@ -577,7 +307,7 @@ rl::Bitmap::Row rl::Bitmap::GetRow(std::size_t y, std::size_t page, std::optiona
         );
 }
 
-const rl::Bitmap::Row rl::Bitmap::GetRowConst(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+const rl::Bitmap::Row::View rl::Bitmap::GetRowView(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
 {
     if (y >= this->height || page >= this->page_count)
     {
@@ -588,64 +318,25 @@ const rl::Bitmap::Row rl::Bitmap::GetRowConst(std::size_t y, std::size_t page, s
         throw rl::runtime_error("fake row size larger than real row size");
     }
     return
-        rl::Bitmap::Row(
-            const_cast<rl::Bitmap::byte_t*>(this->GetDataConst(0, y, page, 0)),
+        rl::Bitmap::Row::View(
+            this->GetData(0, y, page, 0),
             this->width,
             fake_depth_o.value_or(this->depth),
             fake_color_o.value_or(this->color)
         );
 }
 
-void rl::Bitmap::Save(std::string_view path, std::size_t page)
-{
-    if (page >= this->GetPageCount())
-    {
-        throw rl::runtime_error("save page out of bitmap");
-    }
-    png_structp png_ptr = nullptr;
-    png_infop info_ptr = nullptr;
-    std::ofstream file;
-    try
-    {
-        rl::libpng_write_open(path, png_ptr, info_ptr, file);
-        if (setjmp(png_jmpbuf(png_ptr)))
-        {
-            throw rl::runtime_error("libpng jump buffer called");
-        }
-        rl::libpng_set_write_fn(png_ptr, file);
-        const auto png_color = rl::bitmap_color_to_libpng_color(this->color);
-        // if the depth is normalized, need to convert each row while writing to a depth that libpng supports
-        if (this->depth == rl::Bitmap::Depth::Normalized)
-        {
-            png_set_IHDR(
-                png_ptr,
-                info_ptr,
-                static_cast<png_uint_32>(this->width),
-                static_cast<png_uint_32>(this->height),
-                16,
-                png_color,
-                PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE
-            );
-            // TODO
-        }
-        else // if (this->depth != rl::Bitmap::Depth::Normalized)
-        {
-
-        }
-    }
-    catch(const std::exception& e)
-    {
-        rl::libpng_write_close(png_ptr, info_ptr, file);
-        throw e;
-    }
-}
-
 bool rl::Bitmap::GetIsEmpty() const noexcept
 {
-    return this->data == nullptr;
+    return this->width == 0;
 }
 
-void rl::Bitmap::Blit(const rl::Bitmap& bitmap, std::size_t x, std::size_t y, std::size_t page)
+void rl::Bitmap::Save(std::string_view path, std::size_t page)
+{
+    this->GetBitmapView().Save(path, page);
+}
+
+void rl::Bitmap::Blit(const rl::Bitmap::View& bitmap, std::size_t x, std::size_t y, std::size_t page)
 {
     if (
         !this->blit_fits(
@@ -665,7 +356,7 @@ void rl::Bitmap::Blit(const rl::Bitmap& bitmap, std::size_t x, std::size_t y, st
     {
         for (std::size_t blit_y = 0; blit_y < bitmap.GetHeight(); blit_y++)
         {
-            const auto source_row = bitmap.GetRowConst(blit_y, blit_page);
+            const auto source_row = bitmap.GetRowView(blit_y, blit_page);
             auto destination_row = this->GetRow(blit_y, blit_page);
             destination_row.Blit(source_row);
         }
@@ -703,7 +394,7 @@ void rl::Bitmap::Blit(std::string_view path, std::size_t x, std::size_t y, std::
                 // use a pointer to the row but pretend it has sexdecuple depth
                 auto source_row = this->GetRow(y, page, rl::Bitmap::Depth::Sexdecuple);
                 // load the 16 bit pixels in place instead of allocating seperate memory to decrease allocations
-                png_read_row(png_ptr, source_row.GetData(), NULL);
+                png_read_row(png_ptr, reinterpret_cast<png_bytep>(source_row.GetData()), NULL);
                 // now get a mutable view to the row with the correct depth
                 auto destination_row = this->GetRow(y, page);
                 // blit the row to itself, converting the depth to be normalized
@@ -719,7 +410,7 @@ void rl::Bitmap::Blit(std::string_view path, std::size_t x, std::size_t y, std::
                 // grab the row
                 auto row = this->GetRow(y, page);
                 // write the pixels to it
-                png_read_row(png_ptr, row.GetData(), NULL);
+                png_read_row(png_ptr, reinterpret_cast<png_bytep>(row.GetData()), NULL);
             }
         }
     }

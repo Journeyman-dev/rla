@@ -20,6 +20,9 @@
 
 target_sources(${PROJECT_NAME}
     PRIVATE
+        "Bitmap_Row_View.cpp"
+        "Bitmap_Row.cpp"
+        "Bitmap_View.cpp"
         "Bitmap.cpp"
         "font_exception.cpp"
         "Font.cpp"

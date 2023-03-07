@@ -30,6 +30,8 @@ struct FT_FaceRec_;
 
 namespace rl
 {
+    class Bitmap;
+
     class Font
     {
         private:
@@ -47,6 +49,6 @@ namespace rl
             bool IsLoaded() const noexcept;
             void SetPixelSizes(int width, int height);
             void LoadChar(char character);
-            rl::Bitmap GetCharBitmap() const;
+            rl::Bitmap::View GetCharBitmap() const;
     };
 }
