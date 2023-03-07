@@ -142,3 +142,292 @@ constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t width,
             channel
         );
 }
+
+constexpr rl::Bitmap::Bitmap(
+    rl::Bitmap::byte_t* data,
+    std::size_t width,
+    std::size_t height,
+    std::size_t page_count,
+    rl::Bitmap::Depth depth,
+    rl::Bitmap::Color color,
+    std::optional<std::size_t> row_offset_o,
+    std::optional<std::size_t> page_offset_o
+) noexcept
+    : data(data)
+    , width(width)
+    , height(height)
+    , page_count(page_count)
+    , depth(depth)
+    , color(color)
+    , row_offset(row_offset)
+{
+}
+
+constexpr std::size_t rl::Bitmap::GetWidth() const noexcept
+{
+    return this->width;
+}
+
+constexpr std::size_t rl::Bitmap::GetHeight() const noexcept
+{
+    return this->height;
+}
+
+constexpr std::size_t rl::Bitmap::GetPageCount() const noexcept
+{
+    return this->page_count;
+}
+
+constexpr std::size_t rl::Bitmap::GetChannelSize() const noexcept
+{
+    return
+        rl::Bitmap::GetChannelSize(
+            this->depth
+        );
+}
+
+constexpr rl::Bitmap::Depth rl::Bitmap::GetDepth() const noexcept
+{
+    return this->depth;
+}
+
+constexpr rl::Bitmap::Color rl::Bitmap::GetColor() const noexcept
+{
+    return this->color;
+}
+
+constexpr std::size_t rl::Bitmap::GetBitDepth() const noexcept
+{
+    return
+        rl::Bitmap::GetBitDepth(
+            this->depth
+        );
+}
+
+constexpr rl::Bitmap::byte_t* rl::Bitmap::GetData() const noexcept
+{
+    return this->data;
+}
+
+constexpr rl::Bitmap::byte_t* rl::Bitmap::GetData(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
+{
+    const auto byte_index_o = this->GetByteIndex(x, y, page, channel);
+    if (!byte_index_o.has_value())
+    {
+        return nullptr;
+    }
+    return
+        this->data +
+        byte_index_o.value();
+}
+
+constexpr std::size_t rl::Bitmap::GetChannelCount() const noexcept
+{
+    return
+        rl::Bitmap::GetChannelCount(
+            this->color
+        );
+}
+
+constexpr std::size_t rl::Bitmap::GetRowSize() const noexcept
+{
+    return
+        rl::Bitmap::GetRowSize(
+            this->width,
+            this->depth,
+            this->color
+        );
+}
+
+constexpr std::size_t rl::Bitmap::GetPixelSize() const noexcept
+{
+    return
+        rl::Bitmap::GetPixelSize(
+            this->depth,
+            this->color
+        );
+}
+
+constexpr std::size_t rl::Bitmap::GetPageSize() const noexcept
+{
+    return
+        rl::Bitmap::GetPageSize(
+            this->width,
+            this->height,
+            this->depth,
+            this->color
+        );
+}
+
+constexpr std::size_t rl::Bitmap::GetSize() const noexcept
+{
+    return
+        rl::Bitmap::GetSize(
+            this->width,
+            this->height,
+            this->page_count,
+            this->depth,
+            this->color
+        );
+}
+
+constexpr std::size_t rl::Bitmap::GetRowOffset() const noexcept
+{
+    return this->row_offset;
+}
+
+constexpr std::size_t rl::Bitmap::GetPageOffset() const noexcept
+{
+    return this->page_offset;
+}
+
+constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t x, std::size_t y, std::size_t page, std::size_t channel) const noexcept
+{
+    return
+        rl::Bitmap::GetByteIndex(
+            this->width,
+            this->height,
+            this->page_count,
+            this->depth,
+            this->color,
+            this->row_offset,
+            this->page_offset,
+            x,
+            y,
+            page,
+            channel
+        );
+}
+
+constexpr rl::Bitmap rl::Bitmap::GetBitmap(std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
+{
+    return
+        this->GetBitmap(
+            0,
+            0,
+            0,
+            this->width,
+            this->height,
+            this->page_count,
+            fake_depth_o,
+            fake_color_o
+        );
+}
+
+constexpr rl::Bitmap rl::Bitmap::GetBitmap(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o)
+{
+    if (
+        x >= this->width ||
+        y >= this->height ||
+        page >= this->page_count ||
+        x + width >= this->width ||
+        y + height >= this->height ||
+        page + page_count >= this->page_count
+    )
+    {
+        throw rl::runtime_error("view out of bitmap");
+    }
+    if (rl::Bitmap::GetRowSize(this->width, fake_depth_o.value_or(this->depth), fake_color_o.value_or(this->color)) > this->GetRowSize())
+    {
+        throw rl::runtime_error("fake bitmap size larger than real bitmap size");
+    }
+    return
+        rl::Bitmap(
+            this->GetData(x, y, page, 0),
+            width,
+            height,
+            page_count,
+            fake_depth_o.value_or(this->depth),
+            fake_color_o.value_or(this->color),
+            this->row_offset,
+            this->page_offset
+        );
+}
+
+constexpr rl::Bitmap::View rl::Bitmap::GetBitmapView(std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+{
+    return
+        this->GetBitmapView(
+            0,
+            0,
+            0,
+            this->width,
+            this->height,
+            this->page_count,
+            fake_depth_o,
+            fake_color_o
+        );
+}
+
+constexpr rl::Bitmap::View rl::Bitmap::GetBitmapView(std::size_t x, std::size_t y, std::size_t page, std::size_t width, std::size_t height, std::size_t page_count, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+{
+    if (
+        x >= this->width ||
+        y >= this->height ||
+        page >= this->page_count ||
+        x + width >= this->width ||
+        y + height >= this->height ||
+        page + page_count >= this->page_count
+    )
+    {
+        throw rl::runtime_error("view out of bitmap");
+    }
+    if (rl::Bitmap::GetRowSize(this->width, fake_depth_o.value_or(this->depth), fake_color_o.value_or(this->color)) > this->GetRowSize())
+    {
+        throw rl::runtime_error("fake bitmap size larger than real bitmap size");
+    }
+    return
+        rl::Bitmap::View(
+            this->GetData(x, y, page, 0),
+            width,
+            height,
+            page_count,
+            fake_depth_o.value_or(this->depth),
+            fake_color_o.value_or(this->color),
+            this->row_offset,
+            this->page_offset
+        );
+}
+
+constexpr rl::Bitmap::Row rl::Bitmap::GetRow(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+{
+    if (y >= this->height || page >= this->page_count)
+    {
+        throw rl::runtime_error("row out of bitmap");
+    }
+    if (rl::Bitmap::GetRowSize(this->width, fake_depth_o.value_or(this->depth), fake_color_o.value_or(this->color)) > this->GetRowSize())
+    {
+        throw rl::runtime_error("fake row size larger than real row size");
+    }
+    return
+        rl::Bitmap::Row(
+            this->GetData(0, y, page, 0),
+            this->width,
+            fake_depth_o.value_or(this->depth),
+            fake_color_o.value_or(this->color)
+        );
+}
+
+constexpr const rl::Bitmap::Row::View rl::Bitmap::GetRowView(std::size_t y, std::size_t page, std::optional<rl::Bitmap::Depth> fake_depth_o, std::optional<rl::Bitmap::Color> fake_color_o) const
+{
+    if (y >= this->height || page >= this->page_count)
+    {
+        throw rl::runtime_error("row out of bitmap");
+    }
+    if (rl::Bitmap::GetRowSize(this->width, fake_depth_o.value_or(this->depth), fake_color_o.value_or(this->color)) > this->GetRowSize())
+    {
+        throw rl::runtime_error("fake row size larger than real row size");
+    }
+    return
+        rl::Bitmap::Row::View(
+            this->GetData(0, y, page, 0),
+            this->width,
+            fake_depth_o.value_or(this->depth),
+            fake_color_o.value_or(this->color)
+        );
+}
+
+constexpr bool rl::Bitmap::GetIsEmpty() const noexcept
+{
+    return this->width == 0;
+}
