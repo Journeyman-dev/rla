@@ -22,4 +22,5 @@
 target_sources(RlaTest
     PRIVATE
         "color_conversion_tests.cpp"
+        "static_bitmap_func_tests.cpp"
 )
