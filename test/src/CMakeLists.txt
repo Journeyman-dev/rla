@@ -21,4 +21,5 @@
 
 target_sources(RlaTest
     PRIVATE
+        "color_conversion_tests.cpp"
 )
