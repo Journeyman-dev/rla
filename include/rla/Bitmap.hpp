@@ -23,6 +23,7 @@
 #pragma once
 
 #include <rlm/cellular/cell_box2.hpp>
+#include <rlm/color/concepts.hpp>
 #include <cstddef>
 #include <string>
 #include <optional>
@@ -183,6 +184,8 @@ namespace rl
             static constexpr std::size_t GetPageSize(std::size_t width, std::size_t height, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept;
             static constexpr std::size_t GetSize(std::size_t width, std::size_t height, std::size_t pages, rl::Bitmap::Depth depth, rl::Bitmap::Color color) noexcept;
             static constexpr std::optional<std::size_t> GetByteIndex(std::size_t width, std::size_t height, std::size_t pages, rl::Bitmap::Depth depth, rl::Bitmap::Color color, std::size_t row_offset, std::size_t page_offset, std::size_t x, std::size_t y, std::size_t page, std::size_t channel) noexcept;
+            template<rl::color_channel C>
+            static constexpr rl::Bitmap::Depth GetDepth() noexcept;
     
         protected:
             rl::Bitmap::byte_t* data = nullptr;

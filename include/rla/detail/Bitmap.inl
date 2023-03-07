@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <optional>
 #include <cstring>
+#include <type_traits>
 
 constexpr std::size_t rl::Bitmap::GetChannelCount(rl::Bitmap::Color color) noexcept
 {
@@ -144,6 +145,25 @@ constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t width,
             rl::Bitmap::GetChannelSize(depth) * 
             channel
         );
+}
+
+template<rl::color_channel C>
+static constexpr rl::Bitmap::Depth rl::Bitmap::GetDepth() noexcept
+{
+    if constexpr (std::is_same<C, rl::Bitmap::octuple_t>::value)
+    {
+        return rl::Bitmap::Depth::Octuple;
+    }
+    else if constexpr (std::is_same<C, rl::Bitmap::sexdecuple_t>::value)
+    {
+        return rl::Bitmap::Depth::Sexdecuple;
+    }
+    else if constexpr (std::is_same<C, rl::Bitmap::normalized>::value)
+    {
+        return rl::Bitmap::Depth::Normalized;
+    }
+    static_assert(false, "invalid color channel type for bitmap");
+    return rl::Bitmap::Depth::Default;
 }
 
 constexpr bool rl::Bitmap::blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept
