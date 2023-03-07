@@ -22,6 +22,8 @@
 
 #include <rla/Bitmap.hpp>
 #include <rld/except.hpp>
+#include <rlm/cellular/cell_box2.hpp>
+#include <rlm/cellular/does_contain.hpp>
 #include "libpng_ext.hpp"
 #include <png.h>
 #include <cstddef>
