@@ -31,7 +31,6 @@ namespace rl
     class Image;
     class Png;
 
-
     class Bitmap
     {
         public:
