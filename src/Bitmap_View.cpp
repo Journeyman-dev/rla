@@ -21,6 +21,7 @@
 */
 
 #include <rla/Bitmap.hpp>
+#include <rla/Image.hpp>
 #include <rld/except.hpp>
 #include "libpng_ext.hpp"
 #include <png.h>
@@ -283,21 +284,42 @@ void rl::Bitmap::View::Save(std::string_view path, std::size_t page)
         // if the depth is normalized, need to convert each row while writing to a depth that libpng supports
         if (this->depth == rl::Bitmap::Depth::Normalized)
         {
+            const auto write_depth = rl::Bitmap::Depth::Sexdecuple;
+            rl::Image::Row convert_row(this->width, write_depth, this->color);
             png_set_IHDR(
                 png_ptr,
                 info_ptr,
                 static_cast<png_uint_32>(this->width),
                 static_cast<png_uint_32>(this->height),
-                16,
+                rl::Bitmap::GetBitDepth(write_depth),
                 png_color,
                 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE
             );
-            // TODO
+            for (std::size_t row_i = 0; row_i < this->height; row_i++)
+            {
+                const auto source_row = this->GetRowView(row_i, page);
+                convert_row.Blit(source_row);
+                png_write_row(png_ptr, reinterpret_cast<png_const_bytep>(convert_row.GetData()));
+            }
         }
         else // if (this->depth != rl::Bitmap::Depth::Normalized)
         {
-
+            png_set_IHDR(
+                png_ptr,
+                info_ptr,
+                static_cast<png_uint_32>(this->width),
+                static_cast<png_uint_32>(this->height),
+                this->GetBitDepth(),
+                png_color,
+                PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE
+            );
+            for (std::size_t row_i = 0; row_i < this->height; row_i++)
+            {
+                const auto source_row = this->GetRowView(row_i, page);
+                png_write_row(png_ptr, reinterpret_cast<png_const_bytep>(source_row.GetData()));
+            }
         }
+        rl::libpng_write_close(png_ptr, info_ptr, file);
     }
     catch(const std::exception& e)
     {
