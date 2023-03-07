@@ -26,6 +26,7 @@ target_sources(${PROJECT_NAME}
         "Bitmap.cpp"
         "font_exception.cpp"
         "Font.cpp"
+        "Image_Row.cpp"
         "Image.cpp"
         "Png.cpp"
         "libpng_ext.cpp"

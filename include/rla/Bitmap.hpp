@@ -109,6 +109,8 @@ namespace rl
                     rl::Bitmap::Depth depth,
                     rl::Bitmap::Color color
                 ) noexcept;
+                virtual ~Row() noexcept = default;
+                
                 std::size_t GetWidth() const noexcept;
                 rl::Bitmap::Depth GetDepth() const noexcept;
                 rl::Bitmap::Color GetColor() const noexcept;

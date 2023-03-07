@@ -21,11 +21,8 @@
 */
 
 #include <rla/Image.hpp>
-#include <rla/Png.hpp>
-#include <rla/color_conversion.hpp>
-#include <cstring>
 
-void rl::Image::shrink_data()
+void rl::Image::Row::shrink_data()
 {
     if (this->GetSize() == 0 && this->data != nullptr)
     {
@@ -42,7 +39,7 @@ void rl::Image::shrink_data()
     }
 }
 
-void rl::Image::reserve_data(std::size_t capacity)
+void rl::Image::Row::reserve_data(std::size_t capacity)
 {
     if (capacity > this->capacity)
     {
@@ -54,84 +51,61 @@ void rl::Image::reserve_data(std::size_t capacity)
     }
 }
 
-void rl::Image::free_data() noexcept
+void rl::Image::Row::free_data() noexcept
 {
     delete[] this->data;
     this->capacity = 0;
     this->data = nullptr;
 }
 
-rl::Image::Image(std::size_t capacity)
+rl::Image::Row::Row(std::size_t capacity)
 {
     this->reserve_data(capacity);
 }
 
-rl::Image::Image(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color)
+rl::Image::Row::Row(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color)
 {
-    this->Create(width, height, page_count, depth, color);
+    this->Create(width, depth, color);
 }
 
-rl::Image::~Image() noexcept
+rl::Image::Row::~Row() noexcept
 {
     this->free_data();
 }
 
-void rl::Image::Clear() noexcept
+void rl::Image::Row::Clear() noexcept
 {
     this->width = 0;
-    this->height = 0;
-    this->page_count = 0;
     this->depth = rl::Bitmap::Depth::Default;
     this->color = rl::Bitmap::Color::Default;
 }
 
-void rl::Image::ShrinkToFit()
+void rl::Image::Row::ShrinkToFit()
 {
     this->shrink_data();
 }
 
-void rl::Image::Reserve(std::size_t capacity)
+void rl::Image::Row::Reserve(std::size_t capacity)
 {
     this->reserve_data(capacity);
+}   
+
+std::size_t rl::Image::Row::GetCapacity() const noexcept
+{
+    return this->capacity;
 }
 
-void rl::Image::Create(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color)
+void rl::Image::Row::Create(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color)
 {
     this->Clear();
     const auto size = 
-        rl::Bitmap::GetSize(
+        rl::Bitmap::GetRowSize(
             width,
-            height,
-            page_count,
             depth,
             color
         );
     this->reserve_data(size);
     this->width = width;
-    this->height = height;
-    this->page_count = page_count;
     this->color = color;
     this->depth = depth;
-}
-
-void rl::Image::Load(const rl::Png& png, std::optional<rl::Bitmap::Depth> depth_o, std::optional<rl::Bitmap::Color> color_o)
-{
-    this->Create(
-        png.GetWidth(),
-        png.GetHeight(),
-        1,
-        depth_o.value_or(
-            rl::Bitmap::GetDepth(png.GetBitDepth())
-        ),
-        color_o.value_or(
-            rl::to_bitmap_color(png.GetColor())
-        )
-    );
-    this->Blit(png, 0, 0, 0);
-}
-
-void rl::Image::Load(std::string_view path, std::optional<rl::Bitmap::Depth> depth_o, std::optional<rl::Bitmap::Color> color_o)
-{
-    const auto png = rl::Png(path);
-    this->Load(png, depth_o, color_o);
 }

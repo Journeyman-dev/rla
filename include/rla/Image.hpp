@@ -51,8 +51,52 @@ namespace rl
             std::size_t capacity = 0;
 
         public:
+            class Row : public rl::Bitmap::Row
+            {
+                protected:
+                    void shrink_data();
+                    void reserve_data(std::size_t capacity);
+                    void free_data() noexcept;
+
+                protected:
+                    std::size_t capacity = 0;
+
+                public:
+                    using rl::Bitmap::Row::Row;
+
+                    constexpr Row() noexcept = default;
+                    Row(std::size_t capacity);
+                    Row(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
+                    template<rl::color_channel C>
+                    Row(const rl::color_g<C>& color, std::size_t width);
+                    template<rl::color_channel C>
+                    Row(const rl::color_ga<C>& color, std::size_t width);
+                    template<rl::color_channel C>
+                    Row(const rl::color_rgb<C>& color, std::size_t width);
+                    template<rl::color_channel C>
+                    Row(const rl::color_rgba<C>& color, std::size_t width);
+                    ~Row() noexcept override;
+
+                    void Clear() noexcept;
+                    void ShrinkToFit();
+                    void Reserve(std::size_t capacity);
+                    std::size_t GetCapacity() const noexcept;
+                    void Create(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
+                    template<rl::color_channel C>
+                    void Create(const rl::color_g<C>& color, std::size_t width);
+                    template<rl::color_channel C>
+                    void Create(const rl::color_ga<C>& color, std::size_t width);
+                    template<rl::color_channel C>
+                    void Create(const rl::color_rgb<C>& color, std::size_t width);
+                    template<rl::color_channel C>
+                    void Create(const rl::color_rgba<C>& color, std::size_t width);
+            };
+
+        public:
             using rl::Bitmap::Bitmap;
 
+            constexpr Image() noexcept = default;
+            Image(std::size_t capacity);
             Image(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
             template<rl::color_channel C>
             Image(const rl::color_g<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
