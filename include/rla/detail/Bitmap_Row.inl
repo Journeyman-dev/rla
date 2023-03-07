@@ -20,11 +20,14 @@
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <rla/Bitmap.hpp>
+#pragma once
+
 #include <rld/except.hpp>
 #include <cstddef>
+#include <optional>
 
-rl::Bitmap::Row::Row(
+
+constexpr rl::Bitmap::Row::Row(
     rl::Bitmap::byte_t* data,
     std::size_t width,
     rl::Bitmap::Depth depth,
@@ -37,27 +40,27 @@ rl::Bitmap::Row::Row(
 {
 }
 
-std::size_t rl::Bitmap::Row::GetWidth() const noexcept
+constexpr std::size_t rl::Bitmap::Row::GetWidth() const noexcept
 {
     return this->width;
 }
 
-rl::Bitmap::Depth rl::Bitmap::Row::GetDepth() const noexcept
+constexpr rl::Bitmap::Depth rl::Bitmap::Row::GetDepth() const noexcept
 {
     return this->depth;
 }
 
-rl::Bitmap::Color rl::Bitmap::Row::GetColor() const noexcept
+constexpr rl::Bitmap::Color rl::Bitmap::Row::GetColor() const noexcept
 {
     return this->color;
 }
 
-rl::Bitmap::byte_t* rl::Bitmap::Row::GetData() const noexcept
+constexpr rl::Bitmap::byte_t* rl::Bitmap::Row::GetData() const noexcept
 {
     return this->data;
 }
 
-rl::Bitmap::byte_t* rl::Bitmap::Row::GetData(std::size_t x, std::size_t channel) const noexcept
+constexpr rl::Bitmap::byte_t* rl::Bitmap::Row::GetData(std::size_t x, std::size_t channel) const noexcept
 {
     const auto byte_index_o = this->GetByteIndex(x, channel);
     if (!byte_index_o.has_value())
@@ -69,22 +72,22 @@ rl::Bitmap::byte_t* rl::Bitmap::Row::GetData(std::size_t x, std::size_t channel)
         byte_index_o.value();
 }
 
-std::size_t rl::Bitmap::Row::GetChannelSize() const noexcept
+constexpr std::size_t rl::Bitmap::Row::GetChannelSize() const noexcept
 {
     return rl::Bitmap::GetChannelSize(this->depth);
 }
 
-std::size_t rl::Bitmap::Row::GetBitDepth() const noexcept
+constexpr std::size_t rl::Bitmap::Row::GetBitDepth() const noexcept
 {
     return rl::Bitmap::GetBitDepth(this->depth);
 }
 
-std::size_t rl::Bitmap::Row::GetSize() const noexcept
+constexpr std::size_t rl::Bitmap::Row::GetSize() const noexcept
 {
     return rl::Bitmap::GetRowSize(this->width, this->depth, this->color);
 }
 
-std::optional<std::size_t> rl::Bitmap::Row::GetByteIndex(std::size_t x, std::size_t channel) const noexcept
+constexpr std::optional<std::size_t> rl::Bitmap::Row::GetByteIndex(std::size_t x, std::size_t channel) const noexcept
 {
     return
         rl::Bitmap::GetByteIndex(
@@ -102,7 +105,7 @@ std::optional<std::size_t> rl::Bitmap::Row::GetByteIndex(std::size_t x, std::siz
         );
 }
 
-void rl::Bitmap::Row::Blit(const rl::Bitmap::Row::View& row)
+constexpr void rl::Bitmap::Row::Blit(const rl::Bitmap::Row::View& row)
 {
     if (row.GetWidth() != this->width)
     {
