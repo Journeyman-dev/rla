@@ -194,7 +194,7 @@ namespace rl
             std::size_t row_offset = 0;
             std::size_t page_offset = 0;
 
-            bool blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept;
+            constexpr bool blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept;
         public:
             constexpr Bitmap() noexcept = default;
             constexpr Bitmap(

@@ -34,33 +34,6 @@ void rl::Bitmap::Save(std::string_view path, std::size_t page)
     this->GetBitmapView().Save(path, page);
 }
 
-void rl::Bitmap::Blit(const rl::Bitmap::View& bitmap, std::size_t x, std::size_t y, std::size_t page)
-{
-    if (
-        !this->blit_fits(
-            rl::cell_box2<int>(
-                x,
-                y,
-                bitmap.GetWidth(),
-                bitmap.GetHeight()
-            ),
-            page
-        )
-    )
-    {
-        throw rl::runtime_error("blit out of bitmap");
-    }
-    for (std::size_t blit_page = 0; blit_page < bitmap.GetPageCount(); blit_page++)
-    {
-        for (std::size_t blit_y = 0; blit_y < bitmap.GetHeight(); blit_y++)
-        {
-            const auto source_row = bitmap.GetRowView(blit_y, blit_page);
-            auto destination_row = this->GetRow(blit_y, blit_page);
-            destination_row.Blit(source_row);
-        }
-    }
-}
-
 void rl::Bitmap::Blit(const rl::Png& png, std::size_t x, std::size_t y, std::size_t page)
 {
     this->Blit(png.GetPath(), x, y, page);    

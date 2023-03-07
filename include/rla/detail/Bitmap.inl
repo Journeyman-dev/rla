@@ -28,6 +28,9 @@
 #include <rlm/color/color_rgb.hpp>
 #include <rlm/color/color_rgba.hpp>
 #include <rlm/color/color_conversion.hpp>
+#include <rlm/cellular/cell_box2.hpp>
+#include <rlm/cellular/does_contain.hpp>
+#include <rld/except.hpp>
 #include <cstddef>
 #include <optional>
 #include <cstring>
@@ -141,6 +144,19 @@ constexpr std::optional<std::size_t> rl::Bitmap::GetByteIndex(std::size_t width,
             rl::Bitmap::GetChannelSize(depth) * 
             channel
         );
+}
+
+constexpr bool rl::Bitmap::blit_fits(const rl::cell_box2<int>& blit_box, std::size_t page) const noexcept
+{
+    rl::cell_box2<int> this_box(
+        0,
+        0,
+        static_cast<int>(this->GetWidth()),
+        static_cast<int>(this->GetHeight())
+    );
+    return 
+        page < this->GetPageCount() &&
+        rl::does_contain(this_box, blit_box);
 }
 
 constexpr rl::Bitmap::Bitmap(
@@ -430,4 +446,32 @@ constexpr const rl::Bitmap::Row::View rl::Bitmap::GetRowView(std::size_t y, std:
 constexpr bool rl::Bitmap::GetIsEmpty() const noexcept
 {
     return this->width == 0;
+}
+
+
+constexpr void rl::Bitmap::Blit(const rl::Bitmap::View& bitmap, std::size_t x, std::size_t y, std::size_t page)
+{
+    if (
+        !this->blit_fits(
+            rl::cell_box2<int>(
+                x,
+                y,
+                bitmap.GetWidth(),
+                bitmap.GetHeight()
+            ),
+            page
+        )
+    )
+    {
+        throw rl::runtime_error("blit out of bitmap");
+    }
+    for (std::size_t blit_page = 0; blit_page < bitmap.GetPageCount(); blit_page++)
+    {
+        for (std::size_t blit_y = 0; blit_y < bitmap.GetHeight(); blit_y++)
+        {
+            const auto source_row = bitmap.GetRowView(blit_y, blit_page);
+            auto destination_row = this->GetRow(blit_y, blit_page);
+            destination_row.Blit(source_row);
+        }
+    }
 }
