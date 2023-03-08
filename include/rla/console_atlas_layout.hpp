@@ -32,37 +32,6 @@
 
 namespace rl
 {
-    struct console_atlas_layout
-    {
-        enum class SourceType
-        {
-            Bitmap,
-            Png,
-            Font
-        };
-
-        struct glyph
-        {
-            std::size_t source_i = 0;
-            rl::console_atlas_layout::SourceType source_type = rl::console_atlas_layout::SourceType::Png;
-            std::optional<rl::cell_vector2> top_left_o;
-            std::optional<rl::codepoint_t> codepoint_o;
-        };
-
-        struct face
-        {
-            bool letterboxed_wide = false;
-            bool letterboxed_tall = false;
-            std::optional<std::size_t> font_i_o;
-            std::vector<rl::console_atlas_layout::glyph> glyphs;
-        };
-
-        std::vector<rl::Bitmap> bitmap_sources;
-        std::vector<std::string> png_sources;
-        std::vector<std::string> font_sources;
-        int tile_width;
-        int tile_height;
-        std::vector<rl::console_atlas_layout::face> faces;
-    };
+    
 }
 
