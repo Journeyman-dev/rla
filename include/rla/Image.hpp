@@ -67,14 +67,6 @@ namespace rl
                     constexpr Row() noexcept = default;
                     Row(std::size_t capacity);
                     Row(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
-                    template<rl::color_channel C>
-                    Row(const rl::color_g<C>& color, std::size_t width);
-                    template<rl::color_channel C>
-                    Row(const rl::color_ga<C>& color, std::size_t width);
-                    template<rl::color_channel C>
-                    Row(const rl::color_rgb<C>& color, std::size_t width);
-                    template<rl::color_channel C>
-                    Row(const rl::color_rgba<C>& color, std::size_t width);
                     ~Row() noexcept override;
 
                     void Clear() noexcept;
@@ -82,14 +74,6 @@ namespace rl
                     void Reserve(std::size_t capacity);
                     std::size_t GetCapacity() const noexcept;
                     void Create(std::size_t width, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
-                    template<rl::color_channel C>
-                    void Create(const rl::color_g<C>& color, std::size_t width);
-                    template<rl::color_channel C>
-                    void Create(const rl::color_ga<C>& color, std::size_t width);
-                    template<rl::color_channel C>
-                    void Create(const rl::color_rgb<C>& color, std::size_t width);
-                    template<rl::color_channel C>
-                    void Create(const rl::color_rgba<C>& color, std::size_t width);
             };
 
         public:
@@ -98,14 +82,6 @@ namespace rl
             constexpr Image() noexcept = default;
             Image(std::size_t capacity);
             Image(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
-            template<rl::color_channel C>
-            Image(const rl::color_g<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
-            template<rl::color_channel C>
-            Image(const rl::color_ga<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
-            template<rl::color_channel C>
-            Image(const rl::color_rgb<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
-            template<rl::color_channel C>
-            Image(const rl::color_rgba<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
             ~Image() noexcept override;
 
             void Clear() noexcept;
@@ -113,14 +89,6 @@ namespace rl
             void Reserve(std::size_t capacity);
             std::size_t GetCapacity() const noexcept;
             void Create(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
-            template<rl::color_channel C>
-            void Create(const rl::color_g<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
-            template<rl::color_channel C>
-            void Create(const rl::color_ga<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
-            template<rl::color_channel C>
-            void Create(const rl::color_rgb<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
-            template<rl::color_channel C>
-            void Create(const rl::color_rgba<C>& color, std::size_t width, std::size_t height, std::size_t page_count);
             void Load(const rl::Png& png, std::optional<rl::Bitmap::Depth> depth_o = std::nullopt, std::optional<rl::Bitmap::Color> color_o = std::nullopt);
             void Load(std::string_view path, std::optional<rl::Bitmap::Depth> depth_o = std::nullopt, std::optional<rl::Bitmap::Color> color_o = std::nullopt);
     };
