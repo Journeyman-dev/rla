@@ -57,7 +57,7 @@ void rl::Png::Load(std::string_view path)
     this->bit_depth = static_cast<std::size_t>(bit_depth);
 }
 
-bool rl::Png::GetEmpty() const noexcept
+bool rl::Png::GetIsLoaded() const noexcept
 {
     return this->color == rl::Png::Color::None;
 }

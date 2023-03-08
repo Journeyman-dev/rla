@@ -52,7 +52,7 @@ namespace rl
             Png(std::string_view path);
 
             void Load(std::string_view path);
-            bool GetEmpty() const noexcept;
+            bool GetIsLoaded() const noexcept;
             std::string_view GetPath() const noexcept;
             std::size_t GetWidth() const noexcept;
             std::size_t GetHeight() const noexcept;
