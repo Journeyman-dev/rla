@@ -98,13 +98,17 @@ rl::console_atlas rl::ConsoleAtlasFactory::Create(const rl::console_atlas::layou
         {
             rl::console_atlas_source_key source_key;
             source_key.letterboxed = face.letterboxed;
-            source_key.top_left = glyph_layout.top_left;
             source_key.source_i = glyph_layout.source_i;
             source_key.source = glyph_layout.source;
             if (glyph_layout.source == rl::console_atlas::layout::Source::Font)
             {
                 // we only care about the codepoint for the hash gen if this is a for a font glyph
                 source_key.codepoint = glyph_layout.codepoint;
+            }
+            else
+            {
+                // the top_left property is only relevent for non-font glyphs
+                source_key.top_left = glyph_layout.top_left;
             }
             if (source_map.contains(source_key))
             {
