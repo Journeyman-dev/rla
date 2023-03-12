@@ -23,6 +23,7 @@
 #include <rla/Font.hpp>
 #include <freetype/freetype.h>
 #include <stdexcept>
+#include <string>
 #include <rla/Bitmap.hpp>
 #include <rla/font_exception.hpp>
 
@@ -120,4 +121,18 @@ rl::Bitmap::View rl::Font::GetCharBitmap() const
             std::nullopt,
             std::nullopt
         );
+}
+
+std::wstring rl::Font::GetAllCodepoints() const
+{
+    std::wstring codepoints;
+    codepoints.reserve(this->freetype_face->num_glyphs);
+    FT_UInt glyph_index = 0;
+    FT_ULong next_codepoint = FT_Get_First_Char(this->freetype_face, &glyph_index);
+    while (glyph_index != 0)
+    {
+        codepoints.push_back(next_codepoint);
+        next_codepoint = FT_Get_Next_Char(this->freetype_face, next_codepoint, &glyph_index);
+    }
+    return codepoints;
 }

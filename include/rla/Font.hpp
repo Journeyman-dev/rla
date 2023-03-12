@@ -50,5 +50,6 @@ namespace rl
             void SetPixelSizes(int width, int height);
             void LoadChar(char character);
             rl::Bitmap::View GetCharBitmap() const;
+            std::wstring GetAllCodepoints() const;
     };
 }
