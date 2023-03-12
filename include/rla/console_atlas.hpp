@@ -58,13 +58,17 @@ namespace rl
                 std::size_t source_i = 0;
                 rl::console_atlas::layout::Source source = rl::console_atlas::layout::Source::Png;
                 rl::cell_vector2<int> top_left;
-                std::optional<rl::console_atlas::codepoint_i> codepoint_o;
+                rl::console_atlas::codepoint_i codepoint;
             };
 
             struct face
             {
+                // letterboxed face glyphs have half the width of the atlas width
                 bool letterboxed = false;
+                // The glyphs to add first.
                 std::vector<rl::console_atlas::layout::glyph> glyphs;
+                // All characters of the following font that have codepoints not already used in the glyphs vector will be added after the glyphs for use rendering text
+                std::size_t font;
             };
 
             std::vector<rl::Bitmap::View> bitmap_sources;

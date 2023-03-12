@@ -26,6 +26,7 @@
 #include <rlm/cellular/shape_edges.hpp>
 #include <numeric>
 #include <unordered_map>
+#include <set>
 
 rl::console_atlas rl::ConsoleAtlasFactory::Create(const rl::console_atlas::layout& layout)
 {
@@ -92,6 +93,7 @@ rl::console_atlas rl::ConsoleAtlasFactory::Create(const rl::console_atlas::layou
             (face.letterboxed) ?
             atlas.tile_width / 2 :
             atlas.tile_width;
+        std::set<wchar_t> found_codepoints;
         for (const auto& glyph_layout : face_layout.glyphs)
         {
             rl::console_atlas_source_key source_key;
@@ -101,7 +103,8 @@ rl::console_atlas rl::ConsoleAtlasFactory::Create(const rl::console_atlas::layou
             source_key.source = glyph_layout.source;
             if (glyph_layout.source == rl::console_atlas::layout::Source::Font)
             {
-                source_key.codepoint = glyph_layout.codepoint_o.value();
+                // we only care about the codepoint for the hash gen if this is a for a font glyph
+                source_key.codepoint = glyph_layout.codepoint;
             }
             if (source_map.contains(source_key))
             {
@@ -114,6 +117,36 @@ rl::console_atlas rl::ConsoleAtlasFactory::Create(const rl::console_atlas::layou
                 this->glyph_identifiers.push_back(actual_source_i);
                 this->pack_boxes.emplace_back(this->pack_boxes.size(), tile_width, atlas.tile_height);
                 source_vector.push_back(source_key);
+            }
+            if (found_codepoints.contains(glyph_layout.codepoint))
+            {
+                throw rl::runtime_error("duplicate of same codepoint found in console atlas face");
+            }
+            found_codepoints.insert(glyph_layout.codepoint);
+        }
+        // after the glyphs are done, add the remaining font glyphs with codepoints not already claimed
+        std::wstring font_codepoints = this->font_sources[face_layout.font].GetAllCodepoints();
+        for (const auto codepoint : font_codepoints)
+        {
+            if (!found_codepoints.contains(codepoint))
+            {
+                rl::console_atlas_source_key source_key;
+                source_key.letterboxed = face.letterboxed;;
+                source_key.source_i = face_layout.font;
+                source_key.source = rl::console_atlas::layout::Source::Font;
+                source_key.codepoint = codepoint;
+                if (source_map.contains(source_key))
+                {
+                    this->glyph_identifiers.push_back(source_map.at(source_key));
+                }
+                else
+                {
+                    const auto actual_source_i = this->pack_boxes.size();
+                    source_map[source_key] = actual_source_i;
+                    this->glyph_identifiers.push_back(actual_source_i);
+                    this->pack_boxes.emplace_back(this->pack_boxes.size(), tile_width, atlas.tile_height);
+                    source_vector.push_back(source_key);
+                }
             }
         }
     }
