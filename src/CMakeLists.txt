@@ -22,7 +22,6 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         "Bitmap_View.cpp"
         "Bitmap.cpp"
-        "ConsoleAtlasFactory.cpp"
         "font_exception.cpp"
         "Font.cpp"
         "Image_Row.cpp"

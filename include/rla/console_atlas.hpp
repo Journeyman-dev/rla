@@ -32,8 +32,8 @@ namespace rl
 {
     struct console_atlas    
     {
-        using glyph_i = std::uint32_t;
-        using codepoint_i = std::uint32_t;
+        using glyph_t = std::uint32_t;
+        using codepoint_t = std::uint32_t;
 
         enum class Color
         {
@@ -44,47 +44,11 @@ namespace rl
             Default = GGrayStencilFg
         };
 
-        struct layout
-        {
-            enum class Source
-            {
-                Bitmap,
-                Png,
-                Font
-            };
-
-            struct glyph
-            {
-                std::size_t source_i = 0;
-                rl::console_atlas::layout::Source source = rl::console_atlas::layout::Source::Png;
-                rl::cell_vector2<int> top_left;
-                rl::console_atlas::codepoint_i codepoint;
-            };
-
-            struct face
-            {
-                // letterboxed face glyphs have half the width of the atlas width
-                bool letterboxed = false;
-                // The glyphs to add first.
-                std::vector<rl::console_atlas::layout::glyph> glyphs;
-                // All characters of the following font that have codepoints not already used in the glyphs vector will be added after the glyphs for use rendering text
-                std::size_t font;
-            };
-
-            std::vector<rl::Bitmap::View> bitmap_sources;
-            std::vector<std::string> png_sources;
-            std::vector<std::string> font_sources;
-            int tile_width;
-            int tile_height;
-            rl::console_atlas::Color color = rl::console_atlas::Color::Default;
-            std::vector<rl::console_atlas::layout::face> faces;
-        };
-
         struct face
         {
             bool letterboxed = false;
             std::vector<float> texture_coordinates = std::vector<float>();
-            std::map<rl::console_atlas::codepoint_i, rl::console_atlas::glyph_i> codepoint_map = std::map<rl::console_atlas::codepoint_i, rl::console_atlas::glyph_i>();
+            std::map<rl::console_atlas::codepoint_t, rl::console_atlas::glyph_t> codepoint_map = std::map<rl::console_atlas::codepoint_i, rl::console_atlas::glyph_i>();
         };
 
         int tile_width = 0;
@@ -93,7 +57,5 @@ namespace rl
         rl::console_atlas::Color color = rl::console_atlas::Color::Default;
         rl::Image image = rl::Image();
         std::vector<rl::console_atlas::face> faces = std::vector<rl::console_atlas::face>();
-
-        static rl::console_atlas Create(const rl::console_atlas::layout& layout);
     };
 }
