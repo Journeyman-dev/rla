@@ -57,14 +57,13 @@ namespace rl
             {
                 std::size_t source_i = 0;
                 rl::console_atlas::layout::Source source = rl::console_atlas::layout::Source::Png;
-                std::optional<rl::cell_vector2<int>> top_left_o;
+                rl::cell_vector2<int> top_left;
                 std::optional<rl::console_atlas::codepoint_i> codepoint_o;
             };
 
             struct face
             {
-                bool letterboxed_wide = false;
-                bool letterboxed_tall = false;
+                bool letterboxed = false;
                 std::vector<rl::console_atlas::layout::glyph> glyphs;
             };
 
@@ -79,16 +78,14 @@ namespace rl
 
         struct face
         {
-            bool letterboxed_wide = false;
-            bool letterboxed_tall = false;
+            bool letterboxed = false;
             std::vector<float> texture_coordinates = std::vector<float>();
             std::map<rl::console_atlas::codepoint_i, rl::console_atlas::glyph_i> codepoint_map = std::map<rl::console_atlas::codepoint_i, rl::console_atlas::glyph_i>();
         };
 
         int tile_width = 0;
         int tile_height = 0;
-        bool has_letterboxing_wide = false;
-        bool has_letterboxing_tall = false;
+        bool has_letterboxing = false;
         rl::console_atlas::Color color = rl::console_atlas::Color::Default;
         rl::Image image = rl::Image();
         std::vector<rl::console_atlas::face> faces = std::vector<rl::console_atlas::face>();

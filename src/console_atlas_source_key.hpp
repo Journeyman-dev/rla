@@ -23,15 +23,47 @@
 #pragma once
 
 #include <rlm/cellular/cell_vector2.hpp>
-#include <rla/types.hpp>
-#include <rla/Bitmap.hpp>
-
-#include <vector>
-#include <cstddef>
-#include <optional>
+#include <rlm/cellular/hash.hpp>
+#include <rlm/hash_combine.hpp>
+#include <functional>
 
 namespace rl
 {
-    
+    struct console_atlas_source_key
+    {
+        std::size_t source_i;
+        rl::cell_vector2<int> top_left;
+        bool letterboxed;
+        rl::console_atlas::layout::Source source;
+        int codepoint;
+
+        bool operator==(const rl::console_atlas_source_key& that) const
+        {
+            return
+                this->source_i == that.source_i &&
+                this->top_left == that.top_left &&
+                this->letterboxed == that.letterboxed &&
+                this->source == that.source &&
+                this->codepoint == that.codepoint;
+        }
+    };
 }
 
+namespace std
+{
+    template<>
+    struct hash<rl::console_atlas_source_key> 
+    {
+        std::size_t operator()(const rl::console_atlas_source_key &source) const
+        {
+            return
+                rl::hash_combine(
+                    std::hash<std::size_t>{}(source.source_i),
+                    std::hash<rl::cell_vector2<int>>{}(source.top_left),
+                    std::hash<bool>{}(source.letterboxed),
+                    std::hash<int>{}(static_cast<int>(source.source)),
+                    std::hash<int>{}(source.codepoint)
+                );
+        }
+    };
+}
