@@ -80,6 +80,8 @@ namespace rl
             using rl::Bitmap::Bitmap;
 
             constexpr Image() noexcept = default;
+            Image(const rl::Png& png, std::optional<rl::Bitmap::Depth> depth_o = std::nullopt, std::optional<rl::Bitmap::Color> color_o = std::nullopt);
+            Image(std::string_view path, std::optional<rl::Bitmap::Depth> depth_o = std::nullopt, std::optional<rl::Bitmap::Color> color_o = std::nullopt);
             Image(std::size_t capacity);
             Image(std::size_t width, std::size_t height, std::size_t page_count, rl::Bitmap::Depth depth, rl::Bitmap::Color color);
             ~Image() noexcept override;

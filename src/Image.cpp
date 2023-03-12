@@ -61,6 +61,16 @@ void rl::Image::free_data() noexcept
     this->data = nullptr;
 }
 
+rl::Image::Image(const rl::Png& png, std::optional<rl::Bitmap::Depth> depth_o, std::optional<rl::Bitmap::Color> color_o)
+{
+    this->Load(png, depth_o, color_o);
+}
+
+rl::Image::Image(std::string_view path, std::optional<rl::Bitmap::Depth> depth_o, std::optional<rl::Bitmap::Color> color_o)
+{
+    this->Load(path, depth_o, color_o);
+}
+
 rl::Image::Image(std::size_t capacity)
 {
     this->reserve_data(capacity);
